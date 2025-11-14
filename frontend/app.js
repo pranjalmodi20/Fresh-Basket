@@ -1,31 +1,30 @@
-// Backend API URL (Replace with your deployed backend)
+
 const API_URL = 'https://fresh-basket-sno7.onrender.com';
 
-// Get all DOM elements
+
 const loginForm = document.getElementById('loginForm');
 const signupForm = document.getElementById('signupForm');
 const dashboard = document.getElementById('dashboard');
 const messageBox = document.getElementById('message');
 
-// ===========================
-// FUNCTION 1: Show/Hide Forms
-// ===========================
 
-// Show signup form, hide login form
+
+
+
 function showSignup() {
     loginForm.classList.add('hidden');
     signupForm.classList.remove('hidden');
     clearMessage();
 }
 
-// Show login form, hide signup form
+
 function showLogin() {
     signupForm.classList.add('hidden');
     loginForm.classList.remove('hidden');
     clearMessage();
 }
 
-// Toggle password visibility
+
 function togglePassword(fieldId) {
     const passwordField = document.getElementById(fieldId);
     const icon = event.target;
@@ -39,28 +38,18 @@ function togglePassword(fieldId) {
     }
 }
 
-// ===========================
-// FUNCTION 2: Display Messages
-// ===========================
-
-// Show success/error message
 function showMessage(message, type) {
     messageBox.textContent = message;
     messageBox.className = `message ${type}`;
-
-    // Auto-hide message
     setTimeout(() => clearMessage(), 3000);
 }
 
-// Clear message
+
 function clearMessage() {
     messageBox.textContent = '';
     messageBox.className = 'message';
 }
 
-// ===========================
-// FUNCTION 3: Signup Handler
-// ===========================
 
 document.getElementById('signup').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -100,9 +89,6 @@ document.getElementById('signup').addEventListener('submit', async (e) => {
     }
 });
 
-// ===========================
-// FUNCTION 4: Login Handler
-// ===========================
 
 document.getElementById('login').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -136,9 +122,7 @@ document.getElementById('login').addEventListener('submit', async (e) => {
     }
 });
 
-// ===========================
-// FUNCTION 5: Show Dashboard
-// ===========================
+
 
 function showDashboard(user) {
     loginForm.classList.add('hidden');
@@ -150,9 +134,7 @@ function showDashboard(user) {
     document.getElementById('userEmail').textContent = user.email;
 }
 
-// ===========================
-// FUNCTION 6: Logout
-// ===========================
+
 
 function logout() {
     localStorage.removeItem('token');
@@ -167,9 +149,7 @@ function logout() {
     showMessage('Logged out successfully!', 'success');
 }
 
-// ===========================
-// FUNCTION 7: Auto Login Check
-// ===========================
+
 
 window.addEventListener('load', () => {
     const token = localStorage.getItem('token');
