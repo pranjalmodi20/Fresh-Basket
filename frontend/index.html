@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresh Basket - Login & Signup</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Main Container -->
+    <div class="container">
+        
+        <!-- Header with App Name -->
+        <div class="header">
+            <h1>Fresh Basket</h1>
+            <p>Your Fresh Fruits & Vegetables Store</p>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginForm" class="form-container">
+            <h2>Login</h2>
+            <form id="login">
+                <input type="email" id="loginEmail" placeholder="Email" required>
+                <div class="password-field">
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                    <span class="toggle-password" onclick="togglePassword('loginPassword')">Show</span>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+            <p class="toggle-text">
+                Don't have an account? 
+                <span class="link" onclick="showSignup()">Sign Up</span>
+            </p>
+        </div>
+
+        <!-- Signup Form (Hidden by default) -->
+        <div id="signupForm" class="form-container hidden">
+            <h2>Create Account</h2>
+            <form id="signup">
+                <input type="text" id="signupName" placeholder="Full Name" required>
+                <input type="email" id="signupEmail" placeholder="Email" required>
+                <div class="password-field">
+                    <input type="password" id="signupPassword" placeholder="Password (min 6 characters)" required minlength="6">
+                    <span class="toggle-password" onclick="togglePassword('signupPassword')">Show</span>
+                </div>
+                <button type="submit">Sign Up</button>
+            </form>
+            <p class="toggle-text">
+                Already have an account? 
+                <span class="link" onclick="showLogin()">Login</span>
+            </p>
+        </div>
+
+        <!-- Dashboard (Shown after login) -->
+        <div id="dashboard" class="dashboard hidden">
+            <h2>Welcome to Fresh Basket!</h2>
+            <div class="user-info">
+                <p><strong>Name:</strong> <span id="userName"></span></p>
+                <p><strong>Email:</strong> <span id="userEmail"></span></p>
+            </div>
+            <button onclick="logout()" class="logout-btn">Logout</button>
+        </div>
+
+        <!-- Message Box for notifications -->
+        <div id="message" class="message"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
