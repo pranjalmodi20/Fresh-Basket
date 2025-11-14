@@ -1,5 +1,5 @@
-// Backend API URL
-const API_URL = 'http://localhost:5001';
+// Backend API URL (Replace with your deployed backend)
+const API_URL = 'https://fresh-basket-sno7.onrender.com';
 
 // Get all DOM elements
 const loginForm = document.getElementById('loginForm');
@@ -43,15 +43,13 @@ function togglePassword(fieldId) {
 // FUNCTION 2: Display Messages
 // ===========================
 
-// Show success message
+// Show success/error message
 function showMessage(message, type) {
     messageBox.textContent = message;
     messageBox.className = `message ${type}`;
-    
-    // Auto-hide message after 3 seconds
-    setTimeout(() => {
-        clearMessage();
-    }, 3000);
+
+    // Auto-hide message
+    setTimeout(() => clearMessage(), 3000);
 }
 
 // Clear message
@@ -65,49 +63,39 @@ function clearMessage() {
 // ===========================
 
 document.getElementById('signup').addEventListener('submit', async (e) => {
-    e.preventDefault();  // Stop form from refreshing page
+    e.preventDefault();
     
-    // Get input values
     const name = document.getElementById('signupName').value;
     const email = document.getElementById('signupEmail').value;
     const password = document.getElementById('signupPassword').value;
-    
-    // Validate password length
+
     if (password.length < 6) {
         showMessage('Password must be at least 6 characters long!', 'error');
         return;
     }
-    
+
     try {
-        // Send data to backend
         const response = await fetch(`${API_URL}/signup`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password })
         });
-        
-        // Get response from backend
+
         const data = await response.json();
-        
+
         if (data.success) {
-            // Save token in browser storage
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
-            
+
             showMessage(data.message, 'success');
-            
-            // Show dashboard after 1 second
-            setTimeout(() => {
-                showDashboard(data.user);
-            }, 1000);
+
+            setTimeout(() => showDashboard(data.user), 1000);
         } else {
             showMessage(data.message, 'error');
         }
-        
+
     } catch (error) {
-        showMessage('Network error. Please check if backend is running.', 'error');
+        showMessage('Network error. Backend may be offline.', 'error');
         console.error('Signup error:', error);
     }
 });
@@ -117,42 +105,33 @@ document.getElementById('signup').addEventListener('submit', async (e) => {
 // ===========================
 
 document.getElementById('login').addEventListener('submit', async (e) => {
-    e.preventDefault();  // Stop form from refreshing page
-    
-    // Get input values
+    e.preventDefault();
+
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-    
+
     try {
-        // Send data to backend
         const response = await fetch(`${API_URL}/login`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
-        
-        // Get response from backend
+
         const data = await response.json();
-        
+
         if (data.success) {
-            // Save token in browser storage
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
-            
+
             showMessage(data.message, 'success');
-            
-            // Show dashboard after 1 second
-            setTimeout(() => {
-                showDashboard(data.user);
-            }, 1000);
+
+            setTimeout(() => showDashboard(data.user), 1000);
         } else {
             showMessage(data.message, 'error');
         }
-        
+
     } catch (error) {
-        showMessage('Network error. Please check if backend is running.', 'error');
+        showMessage('Network error. Backend may be offline.', 'error');
         console.error('Login error:', error);
     }
 });
@@ -162,14 +141,11 @@ document.getElementById('login').addEventListener('submit', async (e) => {
 // ===========================
 
 function showDashboard(user) {
-    // Hide forms
     loginForm.classList.add('hidden');
     signupForm.classList.add('hidden');
-    
-    // Show dashboard
+
     dashboard.classList.remove('hidden');
-    
-    // Display user information
+
     document.getElementById('userName').textContent = user.name;
     document.getElementById('userEmail').textContent = user.email;
 }
@@ -179,34 +155,27 @@ function showDashboard(user) {
 // ===========================
 
 function logout() {
-    // Remove token and user data from storage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    
-    // Hide dashboard
+
     dashboard.classList.add('hidden');
-    
-    // Show login form
     loginForm.classList.remove('hidden');
-    
-    // Clear input fields
+
     document.getElementById('loginEmail').value = '';
     document.getElementById('loginPassword').value = '';
-    
+
     showMessage('Logged out successfully!', 'success');
 }
 
 // ===========================
-// FUNCTION 7: Check if Already Logged In
+// FUNCTION 7: Auto Login Check
 // ===========================
 
-// When page loads, check if user is already logged in
 window.addEventListener('load', () => {
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
-    
+
     if (token && user) {
-        // User is already logged in
         showDashboard(JSON.parse(user));
     }
 });
