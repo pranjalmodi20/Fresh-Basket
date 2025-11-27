@@ -6,7 +6,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 
-const User = require('./models/User');
+const User = require('./src/models/User');
 
 
 const app = express();
@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-    origin: "https://fresh-basket-tan.vercel.app",
+    origin: ["https://fresh-basket-tan.vercel.app", "http://localhost:3000"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));
@@ -34,8 +34,6 @@ mongoose.connect(process.env.MONGODB_URI)
     console.log('MongoDB connection error:', err);
     process.exit(1);
 });
-
-
 
 
 
