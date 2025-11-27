@@ -6,11 +6,10 @@ const cors = require('cors');
 require('dotenv').config();
 
 
-const User = require('./src/models/User');
+const user = require('./models/user');
 
 
 const app = express();
-
 
 app.use(express.json());
 
