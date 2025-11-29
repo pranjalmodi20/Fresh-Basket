@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-const API_URL = 'http://localhost:5001';
+const API_URL = 'http://localhost:5001/api/auth';
 
 function App() {
   const [currentView, setCurrentView] = useState('login'); 
@@ -51,65 +51,67 @@ function App() {
   };
 
   // Handle signup
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    
-    if (signupData.password.length < 6) {
-      showMessage('Password must be at least 6 characters long!', 'error');
-      return;
+// SIGNUP
+const handleSignup = async (e) => {
+  e.preventDefault();
+
+  if (signupData.password.length < 6) {
+    showMessage('Password must be at least 6 characters long!', 'error');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(signupData),
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.message) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
+      setCurrentView('dashboard');
+      showMessage(data.message, 'success');
+    } else {
+      showMessage(data.message || 'Signup failed', 'error');
     }
+  } catch (error) {
+    showMessage('Network error. Backend may be offline.', 'error');
+    console.error('Signup error:', error);
+  }
+};
 
-    try {
-      const response = await fetch(`${API_URL}/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(signupData)
-      });
+// LOGIN
+const handleLogin = async (e) => {
+  e.preventDefault();
 
-      const data = await response.json();
+  try {
+    const response = await fetch(`${API_URL}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(loginData),
+    });
 
-      if (data.success) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        setUser(data.user);
-        setCurrentView('dashboard');
-        showMessage(data.message, 'success');
-      } else {
-        showMessage(data.message, 'error');
-      }
-    } catch (error) {
-      showMessage('Network error. Backend may be offline.', 'error');
-      console.error('Signup error:', error);
+    const data = await response.json();
+
+    if (response.ok && data.message) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
+      setCurrentView('dashboard');
+      showMessage(data.message, 'success');
+    } else {
+      showMessage(data.message || 'Login failed', 'error');
     }
-  };
+  } catch (error) {
+    showMessage('Network error. Backend may be offline.', 'error');
+    console.error('Login error:', error);
+  }
+};
 
-  // Handle login
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
-    try {
-      const response = await fetch(`${API_URL}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginData)
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        setUser(data.user);
-        setCurrentView('dashboard');
-        showMessage(data.message, 'success');
-      } else {
-        showMessage(data.message, 'error');
-      }
-    } catch (error) {
-      showMessage('Network error. Backend may be offline.', 'error');
-      console.error('Login error:', error);
-    }
-  };
 
   // Handle logout
   const handleLogout = () => {
