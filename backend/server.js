@@ -3,12 +3,13 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
-// Routes
 const authRoutes = require('./src/routes/authRoutes');
+const productRoutes = require('./src/routes/productRoutes'); // if you created it
 
+// 1) create app first
 const app = express();
 
-// Middleware
+// 2) middlewares
 app.use(express.json());
 app.use(
   cors({
@@ -18,13 +19,12 @@ app.use(
   })
 );
 
-// Basic env check
+// 3) env check + DB connection (same as before)
 if (!process.env.MONGODB_URI || !process.env.JWT_SECRET) {
   console.error('Missing MONGODB_URI or JWT_SECRET in .env');
   process.exit(1);
 }
 
-// MongoDB connection
 mongoose
   .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
@@ -36,7 +36,7 @@ mongoose
     process.exit(1);
   });
 
-// Health route
+// 4) basic health route
 app.get('/', (req, res) => {
   res.json({
     message: 'Welcome to Fresh Basket API!',
@@ -44,19 +44,16 @@ app.get('/', (req, res) => {
     endpoints: {
       signup: 'POST /api/auth/signup',
       login: 'POST /api/auth/login',
+      products: 'GET /api/products',
     },
-    note: 'Use the frontend app to interact with the API.',
   });
 });
 
-// Route mounting
+// 5) route mounting (AFTER app is created)
 app.use('/api/auth', authRoutes);
-// later you will add:
-// const productRoutes = require('./src/routes/productRoutes');
-// app.use('/api/products', productRoutes);
+app.use('/api/products', productRoutes);
 
 const PORT = process.env.PORT || 5001;
-
 app.listen(PORT, () => {
   console.log(`Fresh Basket Server running on port ${PORT}`);
 });

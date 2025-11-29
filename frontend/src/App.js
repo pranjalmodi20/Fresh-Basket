@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 const API_URL = 'http://localhost:5001/api/auth';
+const PRODUCTS_API = 'http://localhost:5001/api/products';
+
 
 function App() {
   const [currentView, setCurrentView] = useState('login'); 
@@ -15,6 +17,9 @@ function App() {
   // Form data states
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [signupData, setSignupData] = useState({ name: '', email: '', password: '' });
+  const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+
 
   // Check if user is already logged in
   useEffect(() => {
@@ -24,6 +29,7 @@ function App() {
     if (token && userData) {
       setUser(JSON.parse(userData));
       setCurrentView('dashboard');
+      fetchProducts();
     }
   }, []);
 
@@ -50,6 +56,20 @@ function App() {
     setTimeout(() => setMessage({ text: '', type: '' }), 3000);
   };
 
+  const fetchProducts = async () => {
+    try {
+      setLoadingProducts(true);
+      const res = await fetch(PRODUCTS_API);
+      const data = await res.json();
+      setProducts(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Fetch products error:', err);
+      showMessage('Failed to load products', 'error');
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
+
   // Handle signup
 // SIGNUP
 const handleSignup = async (e) => {
@@ -74,6 +94,7 @@ const handleSignup = async (e) => {
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
       setCurrentView('dashboard');
+      fetchProducts();
       showMessage(data.message, 'success');
     } else {
       showMessage(data.message || 'Signup failed', 'error');
@@ -220,112 +241,163 @@ const handleLogin = async (e) => {
   );
 
   // Render dashboard
-  const renderDashboard = () => (
-    <div className="dashboard">
-      <div className="dashboard-header">
-        <div>
-          <h2>Welcome to Fresh Basket!</h2>
-          <p className="dashboard-subtitle">An end-to-end fresh produce marketplace built with the MERN stack.</p>
-        </div>
-        <button onClick={handleLogout} className="logout-btn">Logout</button>
+const renderDashboard = () => (
+  <div className="dashboard">
+    <div className="dashboard-header">
+      <div>
+        <h2>Welcome to Fresh Basket!</h2>
+        <p className="dashboard-subtitle">
+          An end-to-end fresh produce marketplace built with the MERN stack.
+        </p>
       </div>
+      <button onClick={handleLogout} className="logout-btn">
+        Logout
+      </button>
+    </div>
 
-      <div className="user-info">
-        <p><strong>Name:</strong> {user?.name}</p>
-        <p><strong>Email:</strong> {user?.email}</p>
-      </div>
+    <div className="user-info">
+      <p>
+        <strong>Name:</strong> {user?.name}
+      </p>
+      <p>
+        <strong>Email:</strong> {user?.email}
+      </p>
+    </div>
 
-      <div className="project-grid">
-        <section className="project-section">
-          <h3>Project Title</h3>
-          <p><strong>Fresh Basket</strong> – An online fruit & vegetable market shop that connects consumers with trusted local vendors for high-quality produce.</p>
-        </section>
-
-        <section className="project-section">
-          <h3>Problem Statement</h3>
-          <p>Consumers struggle to find consistently fresh produce at fair prices due to transparency issues and limited access to reliable suppliers. Fresh Basket streamlines discovery, ordering, and delivery directly from verified vendors.</p>
-        </section>
-
-        <section className="project-section">
-          <h3>System Architecture</h3>
-          <ul className="architecture-list">
-            <li><strong>Frontend →</strong> React SPA (React Router + Tailwind UI)</li>
-            <li><strong>Backend →</strong> Node.js + Express REST API</li>
-            <li><strong>Database →</strong> MongoDB Atlas</li>
-            <li><strong>Authentication →</strong> JWT-based sessions (Firebase Auth planned for OTP / social logins)</li>
-            <li><strong>Hosting →</strong> React on Vercel, API on Render, MongoDB Atlas cluster</li>
-          </ul>
-        </section>
-      </div>
-
-      <section className="project-section full-width">
-        <h3>Key Features</h3>
-        <div className="feature-grid">
-          <article className="feature-card">
-            <h4>Authentication & Authorization</h4>
-            <ul>
-              <li>Secure signup/login with JWT</li>
-              <li>Role-based dashboards for admin, vendor, customer</li>
-              <li>Session persistence with refresh tokens</li>
-            </ul>
-          </article>
-          <article className="feature-card">
-            <h4>CRUD Operations</h4>
-            <ul>
-              <li>Product catalog management</li>
-              <li>Vendor profiles & approvals</li>
-              <li>Order lifecycle tracking</li>
-            </ul>
-          </article>
-          <article className="feature-card">
-            <h4>Frontend Routing</h4>
-            <ul>
-              <li>Pages: Home, Login, Shop, Product Details, Cart</li>
-              <li>Checkout, Profile, Admin Dashboard</li>
-              <li>Protected routes gated by auth middleware</li>
-            </ul>
-          </article>
-          <article className="feature-card">
-            <h4>User Experience</h4>
-            <ul>
-              <li>Search, sorting & filtering by category/vendor</li>
-              <li>Pagination for product listing</li>
-              <li>Real-time cart updates & order status</li>
-            </ul>
-          </article>
-          <article className="feature-card">
-            <h4>Hosting & DevOps</h4>
-            <ul>
-              <li>CI-ready deployment through Vercel/Render</li>
-              <li>Environment-configured connections</li>
-              <li>Monitoring hooks for uptime visibility</li>
-            </ul>
-          </article>
-        </div>
+    <div className="project-grid">
+      <section className="project-section">
+        <h3>Project Title</h3>
+        <p>
+          <strong>Fresh Basket</strong> – An online fruit & vegetable market
+          shop that connects consumers with trusted local vendors for
+          high-quality produce.
+        </p>
       </section>
 
-      <section className="project-section full-width">
-        <h3>Tech Stack</h3>
-        <div className="stack-grid">
-          <div>
-            <strong>Frontend:</strong> React.js, React Router, Tailwind CSS, Axios
-          </div>
-          <div>
-            <strong>Backend:</strong> Node.js, Express.js, JWT, bcrypt
-          </div>
-          <div>
-            <strong>Database:</strong> MongoDB Atlas with Mongoose ODM
-          </div>
-          <div>
-            <strong>Authentication:</strong> Firebase Auth + JWT tokens
-          </div>
-          <div>
-            <strong>Hosting:</strong> Vercel (frontend), Render (backend), MongoDB Atlas (DB)
-          </div>
-        </div>
+      <section className="project-section">
+        <h3>Problem Statement</h3>
+        <p>
+          Consumers struggle to find consistently fresh produce at fair prices
+          due to transparency issues and limited access to reliable suppliers.
+          Fresh Basket streamlines discovery, ordering, and delivery directly
+          from verified vendors.
+        </p>
+      </section>
+
+      <section className="project-section">
+        <h3>System Architecture</h3>
+        <ul className="architecture-list">
+          <li>
+            <strong>Frontend →</strong> React SPA (React Router + Tailwind UI)
+          </li>
+          <li>
+            <strong>Backend →</strong> Node.js + Express REST API
+          </li>
+          <li>
+            <strong>Database →</strong> MongoDB Atlas
+          </li>
+          <li>
+            <strong>Authentication →</strong> JWT-based sessions (Firebase Auth
+            planned for OTP / social logins)
+          </li>
+          <li>
+            <strong>Hosting →</strong> React on Vercel, API on Render, MongoDB
+            Atlas cluster
+          </li>
+        </ul>
       </section>
     </div>
-  );
+
+    <section className="project-section full-width">
+      <h3>Key Features</h3>
+      <div className="feature-grid">
+        <article className="feature-card">
+          <h4>Authentication & Authorization</h4>
+          <ul>
+            <li>Secure signup/login with JWT</li>
+            <li>Role-based dashboards for admin, vendor, customer</li>
+            <li>Session persistence with refresh tokens</li>
+          </ul>
+        </article>
+        <article className="feature-card">
+          <h4>CRUD Operations</h4>
+          <ul>
+            <li>Product catalog management</li>
+            <li>Vendor profiles & approvals</li>
+            <li>Order lifecycle tracking</li>
+          </ul>
+        </article>
+        <article className="feature-card">
+          <h4>Frontend Routing</h4>
+          <ul>
+            <li>Pages: Home, Login, Shop, Product Details, Cart</li>
+            <li>Checkout, Profile, Admin Dashboard</li>
+            <li>Protected routes gated by auth middleware</li>
+          </ul>
+        </article>
+        <article className="feature-card">
+          <h4>User Experience</h4>
+          <ul>
+            <li>Search, sorting & filtering by category/vendor</li>
+            <li>Pagination for product listing</li>
+            <li>Real-time cart updates & order status</li>
+          </ul>
+        </article>
+        <article className="feature-card">
+          <h4>Hosting & DevOps</h4>
+          <ul>
+            <li>CI-ready deployment through Vercel/Render</li>
+            <li>Environment-configured connections</li>
+            <li>Monitoring hooks for uptime visibility</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section className="project-section full-width">
+      <h3>Tech Stack</h3>
+      <div className="stack-grid">
+        <div>
+          <strong>Frontend:</strong> React.js, React Router, Tailwind CSS, Axios
+        </div>
+        <div>
+          <strong>Backend:</strong> Node.js, Express.js, JWT, bcrypt
+        </div>
+        <div>
+          <strong>Database:</strong> MongoDB Atlas with Mongoose ODM
+        </div>
+        <div>
+          <strong>Authentication:</strong> Firebase Auth + JWT tokens
+        </div>
+        <div>
+          <strong>Hosting:</strong> Vercel (frontend), Render (backend), MongoDB
+          Atlas (DB)
+        </div>
+      </div>
+    </section>
+
+    {/* Shop section */}
+    <section className="project-section full-width">
+      <h3>Shop</h3>
+      {loadingProducts ? (
+        <p>Loading products...</p>
+      ) : products.length === 0 ? (
+        <p>No products available yet.</p>
+      ) : (
+        <div className="product-grid">
+          {products.map((p) => (
+            <div key={p._id} className="product-card">
+              <h4>{p.name}</h4>
+              <p className="product-category">{p.category}</p>
+              <p className="product-price">₹{p.price}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  </div>
+);
+
 
   return (
     <div className={`container ${currentView === 'dashboard' ? 'dashboard-view' : ''}`}>
