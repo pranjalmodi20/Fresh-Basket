@@ -17,8 +17,8 @@ router.get('/', getProducts);
 router.get('/:id', getProductById);
 
 // Protected + role-based
-router.post('/', protect, requireRole('vendor', 'admin'), createProduct);
-router.put('/:id', protect, requireRole('vendor', 'admin'), updateProduct);
+router.post('/', protect, requireRole('admin'), createProduct);
+router.put('/:id', protect, requireRole('admin'), updateProduct);
 router.delete('/:id', protect, requireRole('admin'), deleteProduct);
 
 module.exports = router;

@@ -1,6 +1,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('./src/models/User');
+const User = require('../models/user');
+
+const ADMIN_EMAIL = 'pranjalmodibkn@gmail.com';      // your single admin email
+const ADMIN_NAME  = 'Admin';                  // optional default name
 
 const generateToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET, {
@@ -8,10 +11,17 @@ const generateToken = (id, role) => {
   });
 };
 
-// POST /api/auth/signup
+const safeUserFromDoc = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role,        // "admin" or "customer"
+});
+
+// SIGNUP: only ADMIN_EMAIL can ever become admin, everyone else = customer
 exports.signup = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
       return res
@@ -28,22 +38,17 @@ exports.signup = async (req, res) => {
 
     const hashed = await bcrypt.hash(password, 10);
 
+    const role = email === ADMIN_EMAIL ? 'admin' : 'customer';
+
     const user = await User.create({
-      name,
+      name: email === ADMIN_EMAIL ? (name || ADMIN_NAME) : name,
       email,
       password: hashed,
-      // only allow explicit role if you want; otherwise default "customer"
-      role: role || 'customer',
+      role,
     });
 
     const token = generateToken(user._id, user.role);
-
-    const safeUser = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    };
+    const safeUser = safeUserFromDoc(user);
 
     res.status(201).json({
       message: 'Signup successful',
@@ -56,7 +61,7 @@ exports.signup = async (req, res) => {
   }
 };
 
-// POST /api/auth/login
+// LOGIN: just read stored role; only the ADMIN_EMAIL user will have role "admin"
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -76,13 +81,7 @@ exports.login = async (req, res) => {
     }
 
     const token = generateToken(user._id, user.role);
-
-    const safeUser = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    };
+    const safeUser = safeUserFromDoc(user);
 
     res.json({
       message: 'Login successful',

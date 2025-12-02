@@ -120,3 +120,12 @@
   font-size: 13px;
   cursor: pointer;
 }
+
+
+.fb-logo-img {
+  height: 70px;      /* try 32–48px depending on what you like */
+  width: auto;
+  object-fit: contain;
+  margin-right: -1em;
+  margin-left: -2em;
+}

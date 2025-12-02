@@ -6,10 +6,14 @@ const Navbar = ({ onNavigate, currentView, onLogout, user }) => {
     <header className="fb-navbar">
       <div className="fb-nav-left">
         <div className="fb-logo" onClick={() => onNavigate('dashboard')}>
-          <span className="fb-logo-icon">🍎</span>
+          <img
+              src="/freshbasketlogo1.png"           
+              alt="Fresh Basket logo"
+              className="fb-logo-img"
+            />
           <div className="fb-logo-text">
-            <span className="fb-logo-title">Fresh Basket</span>
-            <span className="fb-logo-sub">Fresh Fruits & Veggies</span>
+            <span className="fb-logo-title"></span>
+            <span className="fb-logo-sub"></span>
           </div>
         </div>
 

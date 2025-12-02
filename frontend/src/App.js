@@ -3,6 +3,7 @@ import './App.css';
 import Shop from './Shop';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import AdminPanel from './AdminPanel';
 
 const API_URL = 'http://localhost:5001/api/auth';
 const PRODUCTS_API = 'http://localhost:5001/api/products';
@@ -26,21 +27,28 @@ function App() {
   const [products, setProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
 
-  // later for cart / wishlist
   const [cartItems, setCartItems] = useState([]);
   const [wishlistItems, setWishlistItems] = useState([]);
 
-  // Check if user is already logged in
+  // Restore session
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
 
     if (token && userData) {
-      setUser(JSON.parse(userData));
-      setCurrentView('dashboard');
+      const parsed = JSON.parse(userData);
+      setUser(parsed);
+      setCurrentView(parsed.role === 'admin' ? 'dashboard' : 'shop');
       fetchProducts();
     }
   }, []);
+
+  // Safety: if somehow on dashboard but not admin, redirect to shop
+  useEffect(() => {
+    if (currentView === 'dashboard' && user && user.role !== 'admin') {
+      setCurrentView('shop');
+    }
+  }, [currentView, user]);
 
   const handleLoginChange = (e) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
@@ -98,7 +106,13 @@ function App() {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
-        setCurrentView('dashboard');
+
+        if (data.user.role === 'admin') {
+          setCurrentView('dashboard');
+        } else {
+          setCurrentView('shop');
+        }
+
         fetchProducts();
         showMessage(data.message, 'success');
       } else {
@@ -127,7 +141,13 @@ function App() {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
-        setCurrentView('dashboard');
+
+        if (data.user.role === 'admin') {
+          setCurrentView('dashboard');
+        } else {
+          setCurrentView('shop');
+        }
+
         fetchProducts();
         showMessage(data.message, 'success');
       } else {
@@ -243,101 +263,107 @@ function App() {
   );
 
   // Dashboard with navbar and view switching
-  const renderDashboard = () => (
-    <>
-      <Navbar
-        currentView={currentView}
-        onNavigate={setCurrentView}
-        onLogout={handleLogout}
-        user={user}
-      />
+  const renderDashboard = () => {
+    console.log('currentView:', currentView, 'user role:', user?.role);
 
-      <div className="dashboard">
-        {/* main animated hero on dashboard landing */}
-        {currentView === 'dashboard' && (
-          <section className="dash-hero">
-            <div className="dash-hero-left">
-              <h2 className="dash-hero-title">Fresh food, delivered fast.</h2>
-              <p className="dash-hero-text">
-                Browse organic fruits and vegetables from trusted local vendors
-                and get them delivered to your doorstep.
-              </p>
-            </div>
-            <div className="dash-hero-right">
-              {/* image placed in public/dashboard-hero.jpg */}
-              <img
-                src="/dashboard-hero.jpg"
-                alt="Fresh Basket dashboard"
-                className="dash-hero-image"
-              />
-            </div>
-          </section>
-        )}
+    return (
+      <>
+        <Navbar
+          currentView={currentView}
+          onNavigate={setCurrentView}
+          onLogout={handleLogout}
+          user={user}
+        />
 
-        {currentView === 'shop' && (
-          <Shop
-            products={products}
-            loadingProducts={loadingProducts}
-            onAddToCart={(p) => setCartItems((prev) => [...prev, p])}
-            onAddToWishlist={(p) => setWishlistItems((prev) => [...prev, p])}
-          />
-        )}
-
-        {currentView === 'cart' && (
-          <div>
-            <h2>Cart</h2>
-            {cartItems.length === 0 ? (
-              <p>Your cart is empty.</p>
-            ) : (
-              <ul>
-                {cartItems.map((item, idx) => (
-                  <li key={idx}>{item.name} – ₹{item.price}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
-
-        {currentView === 'wishlist' && (
-          <div>
-            <h2>Wishlist</h2>
-            {wishlistItems.length === 0 ? (
-              <p>No items in wishlist.</p>
-            ) : (
-              <ul>
-                {wishlistItems.map((item, idx) => (
-                  <li key={idx}>{item.name} – ₹{item.price}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
-
-        {currentView === 'profile' && (
-          <div>
-            <h2>Profile</h2>
-            {user && (
-              <>
-                <p>
-                  <strong>Name:</strong> {user.name}
+        <div className="dashboard">
+          {/* Admin-only dashboard hero */}
+          {currentView === 'dashboard' && user?.role === 'admin' && (
+            <section className="dash-hero">
+              <div className="dash-hero-left">
+                <h2 className="dash-hero-title">Fresh food, delivered fast.</h2>
+                <p className="dash-hero-text">
+                  Browse organic fruits and vegetables from trusted local vendors
+                  and get them delivered to your doorstep.
                 </p>
-                <p>
-                  <strong>Email:</strong> {user.email}
-                </p>
-              </>
-            )}
-          </div>
-        )}
+              </div>
+              <div className="dash-hero-right">
+                <img
+                  src="/dashboard-hero.jpg"
+                  alt="Fresh Basket dashboard"
+                  className="dash-hero-image"
+                />
+              </div>
+            </section>
+          )}
 
-        {currentView === 'admin' && (
-          <div>
-            <h2>Admin Panel</h2>
-            <p>Simple placeholder for product create/update/delete UI.</p>
-          </div>
-        )}
-      </div>
-    </>
-  );
+          {currentView === 'shop' && (
+            <Shop
+              products={products}
+              loadingProducts={loadingProducts}
+              onAddToCart={(p) => setCartItems((prev) => [...prev, p])}
+              onAddToWishlist={(p) =>
+                setWishlistItems((prev) => [...prev, p])
+              }
+            />
+          )}
+
+          {currentView === 'cart' && (
+            <div>
+              <h2>Cart</h2>
+              {cartItems.length === 0 ? (
+                <p>Your cart is empty.</p>
+              ) : (
+                <ul>
+                  {cartItems.map((item, idx) => (
+                    <li key={idx}>
+                      {item.name} – ₹{item.price}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+
+          {currentView === 'wishlist' && (
+            <div>
+              <h2>Wishlist</h2>
+              {wishlistItems.length === 0 ? (
+                <p>No items in wishlist.</p>
+              ) : (
+                <ul>
+                  {wishlistItems.map((item, idx) => (
+                    <li key={idx}>
+                      {item.name} – ₹{item.price}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+
+          {currentView === 'profile' && (
+            <div>
+              <h2>Profile</h2>
+              {user && (
+                <>
+                  <p>
+                    <strong>Name:</strong> {user.name}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {user.email}
+                  </p>
+                </>
+              )}
+            </div>
+          )}
+
+          {currentView === 'admin' && user?.role === 'admin' && (
+            <AdminPanel products={products} onRefresh={fetchProducts} />
+          )}
+        </div>
+      </>
+    );
+  };
 
   return (
     <div className="container">

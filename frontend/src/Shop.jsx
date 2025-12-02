@@ -21,14 +21,12 @@ const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
 
       {/* Category row */}
       <section className="shop-categories">
-        {['Vegetables', 'Fruits', 'Fresh Nuts', 'Juices', 'Eggs', 'Healthy'].map(
-          (label) => (
-            <button key={label} className="shop-category-pill">
-              <div className="shop-category-circle" />
-              <span className="shop-category-text">{label}</span>
-            </button>
-          )
-        )}
+        {['Vegetables', 'Fruits'].map((label) => (
+          <button key={label} className="shop-category-pill">
+            <div className="shop-category-circle" />
+            <span className="shop-category-text">{label}</span>
+          </button>
+        ))}
       </section>
 
       {/* Toolbar */}
@@ -37,14 +35,6 @@ const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
           Showing 1–{Math.min(products.length, 10)} of {products.length} items
         </p>
         <div className="shop-toolbar-right">
-          <div className="shop-view-toggle">
-            <button className="shop-view-btn active">
-              <i className="fas fa-th" />
-            </button>
-            <button className="shop-view-btn">
-              <i className="fas fa-list" />
-            </button>
-          </div>
           <select className="shop-sort-select" defaultValue="default">
             <option value="default">Default Sorting</option>
             <option value="price-asc">Price: Low to High</option>
@@ -52,7 +42,6 @@ const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
           </select>
         </div>
       </section>
-
       {/* Products */}
       <section className="shop-products">
         {loadingProducts ? (
@@ -62,7 +51,13 @@ const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
         ) : (
           products.map((p) => (
             <article key={p._id} className="shop-product-card">
-              <div className="shop-product-image" />
+              <div className="shop-product-image">
+                <img
+                  src={p.imageUrl}        // change to p.image if your field name is "image"
+                  alt={p.name}
+                  className="shop-product-img"
+                />
+              </div>
               <div className="shop-product-body">
                 <span className="shop-product-weight">1kg</span>
                 <p className="shop-product-category">{p.category}</p>
