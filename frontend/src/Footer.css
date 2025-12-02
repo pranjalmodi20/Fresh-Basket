@@ -1,0 +1,40 @@
+.fb-footer {
+  margin-top: 40px;
+  padding: 24px 32px 16px;
+  background: #022c22;
+  color: #e5e7eb;
+}
+
+.fb-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  margin-bottom: 12px;
+}
+
+.fb-footer h4,
+.fb-footer h5 {
+  margin-bottom: 8px;
+}
+
+.fb-footer p {
+  font-size: 13px;
+  color: #d1d5db;
+}
+
+.fb-footer ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fb-footer li {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.fb-footer-copy {
+  font-size: 12px;
+  text-align: center;
+  color: #9ca3af;
+}
