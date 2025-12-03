@@ -20,12 +20,6 @@ body {
 }
 
 /* Header */
-.shop-header {
-  background-color: #ffffff;
-  padding: 20px;
-  text-align: center;
-  border-bottom: 1px solid #f0f0f0;
-}
 
 .shop-hero-title {
   font-size: 32px;
@@ -548,4 +542,31 @@ body {
     height: 30px;
     font-size: 12px;
   }
+}
+
+.wishlist-toggle-btn {
+  border: 1px solid #16a34a;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 6px 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #16a34a;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.wishlist-toggle-btn:hover {
+  background-color: #ecfdf3;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+}
+
+.wishlist-toggle-btn.active {
+  background-color: #16a34a;
+  color: #ffffff;
+}
+
+.wishlist-toggle-btn .fa-heart {
+  font-size: 16px;
 }

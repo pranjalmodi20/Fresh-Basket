@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import './Shop.css';
 
-const PAGE_SIZE = 10; // 5 cards x 2 rows = 10 per page
+const PAGE_SIZE = 10; 
 
 const Shop = ({
   products,
@@ -88,12 +88,6 @@ const Shop = ({
   return (
     <div className="shop-page">
       {/* Header */}
-      <section className="shop-header">
-        <p className="shop-hero-kicker">
-          Home / {activeCategory === 'all' ? 'Shop' : title}
-        </p>
-        <h1 className="shop-hero-title">{title}</h1>
-      </section>
 
       {/* Slider */}
       <section className="shop-slider">

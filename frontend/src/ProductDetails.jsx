@@ -5,7 +5,9 @@ const ProductDetails = ({
   product,
   cartItems,
   onSetCartQuantity,
+  wishlistItems = [],
   onBack,
+
 }) => {
   if (!product) {
     return (

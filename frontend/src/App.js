@@ -38,7 +38,7 @@ function App() {
 
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // Restore session -> always go to shop if logged in
+  // Restore session
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
@@ -46,7 +46,7 @@ function App() {
     if (token && userData) {
       const parsed = JSON.parse(userData);
       setUser(parsed);
-      setCurrentView('shop');
+      setCurrentView(parsed.role === 'admin' ? 'dashboard' : 'shop');
       fetchProducts();
       loadWishlist();
     }
@@ -61,6 +61,13 @@ function App() {
       console.error('Load wishlist error:', err);
     }
   };
+
+  // Safety: if somehow on dashboard but not admin, redirect to shop
+  useEffect(() => {
+    if (currentView === 'dashboard' && user && user.role !== 'admin') {
+      setCurrentView('shop');
+    }
+  }, [currentView, user]);
 
   const handleLoginChange = (e) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
@@ -119,8 +126,11 @@ function App() {
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
 
-        // Always go to shop after signup
-        setCurrentView('shop');
+        if (data.user.role === 'admin') {
+          setCurrentView('dashboard');
+        } else {
+          setCurrentView('shop');
+        }
 
         fetchProducts();
         showMessage(data.message, 'success');
@@ -151,8 +161,11 @@ function App() {
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
 
-        // Always go to shop after login
-        setCurrentView('shop');
+        if (data.user.role === 'admin') {
+          setCurrentView('dashboard');
+        } else {
+          setCurrentView('shop');
+        }
 
         fetchProducts();
         showMessage(data.message, 'success');
@@ -333,7 +346,7 @@ function App() {
     </div>
   );
 
-  // Dashboard with navbar and view switching (but default view is shop)
+  // Dashboard with navbar and view switching
   const renderDashboard = () => {
     return (
       <>
