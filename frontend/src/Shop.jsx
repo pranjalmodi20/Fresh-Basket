@@ -1,18 +1,44 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import './Shop.css';
 
 const PAGE_SIZE = 20;
 
-const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
+const Shop = ({
+  products,
+  loadingProducts,
+  onAddToCart,
+  onAddToWishlist,
+  onOpenProduct,
+}) => {
   const [activeCategory, setActiveCategory] = useState('all'); // 'all' | 'vegetables' | 'fruits'
   const [page, setPage] = useState(1);
+
+  // slider state
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const categories = [
     { key: 'vegetables', label: 'Vegetables', img: '/veg.jpg' },
     { key: 'fruits', label: 'Fruits', img: '/fruits.jpg' },
   ];
 
-  // Filter by category
+  const sliderImages = [
+    { src: '/banner1.jpg', alt: 'Promo banner 1' },
+    { src: '/banner2.jpg', alt: 'Promo banner 2' },
+    { src: '/banner3.jpg', alt: 'Promo banner 3' },
+  ];
+
+  // auto‑change slider every 5s
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCurrentSlide((prev) =>
+        prev === sliderImages.length - 1 ? 0 : prev + 1
+      );
+    }, 5000);
+
+    return () => clearInterval(id);
+  }, [sliderImages.length]);
+
+  // Filter by selected category
   const filteredProducts = useMemo(() => {
     if (activeCategory === 'all') return products;
     return products.filter(
@@ -20,15 +46,18 @@ const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
     );
   }, [products, activeCategory]);
 
-  // Pagination data
-  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
+  // Pagination
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredProducts.length / PAGE_SIZE)
+  );
   const currentPage = Math.min(page, totalPages);
   const startIdx = (currentPage - 1) * PAGE_SIZE;
   const pageItems = filteredProducts.slice(startIdx, startIdx + PAGE_SIZE);
 
   const handleCategoryClick = (key) => {
-    setActiveCategory(key);
-    setPage(1); // reset to first page when switching category
+    setActiveCategory((prev) => (prev === key ? 'all' : key)); // toggle
+    setPage(1);
   };
 
   const title =
@@ -40,14 +69,50 @@ const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
 
   return (
     <div className="shop-page">
-      {/* Hero banner */}
-      <section className="shop-hero">
-        <div className="shop-hero-overlay" />
-        <div className="shop-hero-content">
-          <p className="shop-hero-kicker">
-            Home / {activeCategory === 'all' ? 'Shop' : title}
-          </p>
-          <h1 className="shop-hero-title">{title}</h1>
+      {/* Full-width promo slider */}
+      <section className="shop-slider">
+        <div className="shop-slider-inner">
+          <button
+            className="slider-arrow slider-arrow-left"
+            onClick={() =>
+              setCurrentSlide((prev) =>
+                prev === 0 ? sliderImages.length - 1 : prev - 1
+              )
+            }
+          >
+            ‹
+          </button>
+
+          <div className="slider-image-wrap">
+            <img
+              src={sliderImages[currentSlide].src}
+              alt={sliderImages[currentSlide].alt}
+              className="slider-image"
+            />
+          </div>
+
+          <button
+            className="slider-arrow slider-arrow-right"
+            onClick={() =>
+              setCurrentSlide((prev) =>
+                prev === sliderImages.length - 1 ? 0 : prev + 1
+              )
+            }
+          >
+            ›
+          </button>
+        </div>
+
+        <div className="slider-dots">
+          {sliderImages.map((_, idx) => (
+            <button
+              key={idx}
+              className={`slider-dot ${
+                idx === currentSlide ? 'active' : ''
+              }`}
+              onClick={() => setCurrentSlide(idx)}
+            />
+          ))}
         </div>
       </section>
 
@@ -57,7 +122,7 @@ const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
         <h2 className="shop-intro-title">Shop Our Organic Products</h2>
       </section>
 
-      {/* Category “pages” */}
+      {/* Category buttons */}
       <section className="shop-categories">
         {categories.map((cat) => (
           <button
@@ -93,7 +158,7 @@ const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
         </div>
       </section>
 
-      {/* Products */}
+      {/* Products grid */}
       <section className="shop-products">
         {loadingProducts ? (
           <p>Loading products...</p>
@@ -101,7 +166,11 @@ const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
           <p>No products available in this category.</p>
         ) : (
           pageItems.map((p) => (
-            <article key={p._id} className="shop-product-card">
+            <article
+              key={p._id}
+              className="shop-product-card"
+              onClick={() => onOpenProduct && onOpenProduct(p)}
+            >
               <div className="shop-product-image">
                 <img
                   src={p.imageUrl}
@@ -119,13 +188,19 @@ const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
                 <div className="shop-product-actions">
                   <button
                     className="shop-btn shop-btn-primary"
-                    onClick={() => onAddToCart(p)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAddToCart(p);
+                    }}
                   >
                     <i className="fas fa-shopping-cart" /> Add to Cart
                   </button>
                   <button
                     className="shop-btn shop-btn-ghost"
-                    onClick={() => onAddToWishlist(p)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAddToWishlist(p);
+                    }}
                   >
                     <i className="fas fa-heart" /> Wishlist
                   </button>

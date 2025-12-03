@@ -1,0 +1,127 @@
+.product-details-page {
+  max-width: 1200px;
+  margin: 40px auto 60px;
+  padding: 0 24px;
+}
+
+.back-btn {
+  border: none;
+  background: transparent;
+  color: #059669;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.product-details-content {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+/* Left: big image */
+
+.product-details-left {
+  background: #f9fafb;
+  border-radius: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px;
+}
+
+.product-details-main-img {
+  max-width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+/* Right: text & actions */
+
+.product-details-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.breadcrumbs {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.pd-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.pd-category {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.pd-price {
+  font-size: 24px;
+  font-weight: 700;
+  color: #16a34a;
+  margin: 8px 0 20px;
+}
+
+/* Reuse shop buttons */
+
+.product-details-right .shop-btn {
+  width: fit-content;
+}
+
+/* Optional: small feature list like “Why shop from …” */
+
+.pd-feature-list {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pd-feature-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.pd-feature-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #fef3c7;
+}
+
+.pd-feature-text-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #111827;
+}
+
+.pd-feature-text-body {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .product-details-content {
+    grid-template-columns: 1fr;
+  }
+
+  .product-details-left {
+    order: 1;
+  }
+
+  .product-details-right {
+    order: 2;
+  }
+}
