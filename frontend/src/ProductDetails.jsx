@@ -41,7 +41,21 @@ const ProductDetails = ({ product, onAddToCart, onBack }) => {
             <i className="fas fa-shopping-cart" /> Add to cart
           </button>
 
-          {/* Optional extra info */}
+          {/* NEW: description block */}
+          <div className="pd-description-block">
+            <h3 className="pd-desc-title">Description</h3>
+            {product.description ? (
+              <ul className="pd-desc-list">
+                {product.description.split('\n').map((line, idx) => (
+                  <li key={idx}>{line}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="pd-desc-empty">
+                No description available for this item.
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>

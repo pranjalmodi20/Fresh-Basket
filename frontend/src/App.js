@@ -5,6 +5,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import AdminPanel from './AdminPanel';
 import ProductDetails from './ProductDetails';
+import { setCartQuantity } from './cartApi';
 
 const API_URL = 'http://localhost:5001/api/auth';
 const PRODUCTS_API = 'http://localhost:5001/api/products';
@@ -28,6 +29,7 @@ function App() {
   const [products, setProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
 
+  // cartItems: [{ product, quantity }]
   const [cartItems, setCartItems] = useState([]);
   const [wishlistItems, setWishlistItems] = useState([]);
 
@@ -171,6 +173,41 @@ function App() {
     showMessage('Logged out successfully!', 'success');
   };
 
+  // Set quantity for a product in cart + sync with backend
+  const handleSetCartQuantity = async (product, quantity) => {
+    if (quantity < 0) return;
+
+    try {
+      await setCartQuantity(product._id, quantity);
+
+      setCartItems((prev) => {
+        const existing = prev.find(
+          (item) => item.product._id === product._id
+        );
+        if (!existing && quantity === 0) return prev;
+
+        if (!existing) {
+          return [...prev, { product, quantity }];
+        }
+
+        if (quantity === 0) {
+          return prev.filter(
+            (item) => item.product._id !== product._id
+          );
+        }
+
+        return prev.map((item) =>
+          item.product._id === product._id
+            ? { ...item, quantity }
+            : item
+        );
+      });
+    } catch (err) {
+      console.error(err);
+      showMessage('Could not update cart', 'error');
+    }
+  };
+
   const renderLoginForm = () => (
     <div className="form-container">
       <h2>Login</h2>
@@ -195,7 +232,9 @@ function App() {
           />
           <span
             className="toggle-password"
-            onClick={() => togglePasswordVisibility('loginPassword')}
+            onClick={() =>
+              togglePasswordVisibility('loginPassword')
+            }
           >
             {showPassword.loginPassword ? 'Hide' : 'Show'}
           </span>
@@ -247,7 +286,9 @@ function App() {
           />
           <span
             className="toggle-password"
-            onClick={() => togglePasswordVisibility('signupPassword')}
+            onClick={() =>
+              togglePasswordVisibility('signupPassword')
+            }
           >
             {showPassword.signupPassword ? 'Hide' : 'Show'}
           </span>
@@ -283,10 +324,13 @@ function App() {
           {currentView === 'dashboard' && user?.role === 'admin' && (
             <section className="dash-hero">
               <div className="dash-hero-left">
-                <h2 className="dash-hero-title">Fresh food, delivered fast.</h2>
+                <h2 className="dash-hero-title">
+                  Fresh food, delivered fast.
+                </h2>
                 <p className="dash-hero-text">
-                  Browse organic fruits and vegetables from trusted local vendors
-                  and get them delivered to your doorstep.
+                  Browse organic fruits and vegetables from trusted
+                  local vendors and get them delivered to your
+                  doorstep.
                 </p>
               </div>
               <div className="dash-hero-right">
@@ -303,7 +347,8 @@ function App() {
             <Shop
               products={products}
               loadingProducts={loadingProducts}
-              onAddToCart={(p) => setCartItems((prev) => [...prev, p])}
+              cartItems={cartItems}
+              onSetCartQuantity={handleSetCartQuantity}
               onAddToWishlist={(p) =>
                 setWishlistItems((prev) => [...prev, p])
               }
@@ -323,7 +368,8 @@ function App() {
                 <ul>
                   {cartItems.map((item, idx) => (
                     <li key={idx}>
-                      {item.name} – ₹{item.price}
+                      {item.product.name} – {item.quantity} × ₹
+                      {item.product.price}
                     </li>
                   ))}
                 </ul>
@@ -371,9 +417,7 @@ function App() {
           {currentView === 'productDetails' && selectedProduct && (
             <ProductDetails
               product={selectedProduct}
-              onAddToCart={(p) =>
-                setCartItems((prev) => [...prev, p])
-              }
+              onAddToCart={(p) => handleSetCartQuantity(p, 1)}
               onBack={() => setCurrentView('shop')}
             />
           )}
@@ -394,7 +438,9 @@ function App() {
       )}
 
       {message.text && (
-        <div className={`message ${message.type}`}>{message.text}</div>
+        <div className={`message ${message.type}`}>
+          {message.text}
+        </div>
       )}
     </div>
   );

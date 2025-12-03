@@ -6,7 +6,8 @@ const PAGE_SIZE = 20;
 const Shop = ({
   products,
   loadingProducts,
-  onAddToCart,
+  cartItems,
+  onSetCartQuantity,
   onAddToWishlist,
   onOpenProduct,
 }) => {
@@ -22,7 +23,7 @@ const Shop = ({
   ];
 
   const sliderImages = [
-    { src: '/banner1.jpg', alt: 'Promo banner 1' },
+    { src: '/Fresh.png', alt: 'Promo banner 1' },
     { src: '/banner2.jpg', alt: 'Promo banner 2' },
     { src: '/banner3.jpg', alt: 'Promo banner 3' },
   ];
@@ -69,6 +70,14 @@ const Shop = ({
 
   return (
     <div className="shop-page">
+      {/* Small header instead of big hero */}
+      <section className="shop-header">
+        <p className="shop-hero-kicker">
+          Home / {activeCategory === 'all' ? 'Shop' : title}
+        </p>
+        <h1 className="shop-hero-title">{title}</h1>
+      </section>
+
       {/* Full-width promo slider */}
       <section className="shop-slider">
         <div className="shop-slider-inner">
@@ -165,49 +174,84 @@ const Shop = ({
         ) : pageItems.length === 0 ? (
           <p>No products available in this category.</p>
         ) : (
-          pageItems.map((p) => (
-            <article
-              key={p._id}
-              className="shop-product-card"
-              onClick={() => onOpenProduct && onOpenProduct(p)}
-            >
-              <div className="shop-product-image">
-                <img
-                  src={p.imageUrl}
-                  alt={p.name}
-                  className="shop-product-img"
-                />
-              </div>
-              <div className="shop-product-body">
-                <span className="shop-product-weight">1kg</span>
-                <p className="shop-product-category">{p.category}</p>
-                <h3 className="shop-product-name">{p.name}</h3>
-                <p className="shop-product-price">
-                  Actual Price: <span>₹{p.price}</span>
-                </p>
-                <div className="shop-product-actions">
-                  <button
-                    className="shop-btn shop-btn-primary"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onAddToCart(p);
-                    }}
-                  >
-                    <i className="fas fa-shopping-cart" /> Add to Cart
-                  </button>
-                  <button
-                    className="shop-btn shop-btn-ghost"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onAddToWishlist(p);
-                    }}
-                  >
-                    <i className="fas fa-heart" /> Wishlist
-                  </button>
+          pageItems.map((p) => {
+            const qty =
+              cartItems?.find(
+                (item) => item.product._id === p._id
+              )?.quantity || 0;
+
+            return (
+              <article
+                key={p._id}
+                className="shop-product-card"
+                onClick={() => onOpenProduct && onOpenProduct(p)}
+              >
+                <div className="shop-product-image">
+                  <img
+                    src={p.imageUrl}
+                    alt={p.name}
+                    className="shop-product-img"
+                  />
                 </div>
-              </div>
-            </article>
-          ))
+                <div className="shop-product-body">
+                  <span className="shop-product-weight">1kg</span>
+                  <p className="shop-product-category">{p.category}</p>
+                  <h3 className="shop-product-name">{p.name}</h3>
+                  <p className="shop-product-price">
+                    Actual Price: <span>₹{p.price}</span>
+                  </p>
+
+                    <div className="shop-product-actions">
+                      <button
+                        className="shop-btn shop-btn-primary cart-main-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (qty === 0) {
+                            onSetCartQuantity(p, 1);
+                          }
+                        }}
+                      >
+                        {qty === 0 ? (
+                          <i className="fas fa-shopping-cart" />
+                        ) : (
+                          <span
+                            className="qty-control"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button
+                              type="button"
+                              className="qty-btn"
+                              onClick={() => onSetCartQuantity(p, qty - 1)}
+                            >
+                              −
+                            </button>
+                            <span className="qty-value">{qty}</span>
+                            <button
+                              type="button"
+                              className="qty-btn"
+                              onClick={() => onSetCartQuantity(p, qty + 1)}
+                            >
+                              +
+                            </button>
+                          </span>
+                        )}
+                        <span className="cart-main-text">Add to Cart</span>
+                      </button>
+
+                      <button
+                        className="shop-btn shop-btn-ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onAddToWishlist(p);
+                        }}
+                      >
+                        <i className="fas fa-heart" /> Wishlist
+                      </button>
+                    </div>
+                </div>
+              </article>
+            );
+          })
         )}
       </section>
 

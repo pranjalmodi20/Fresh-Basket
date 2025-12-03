@@ -357,3 +357,67 @@
   width: 20px;
   background: #22c55e;
 }
+
+.qty-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #16a34a;
+  border-radius: 999px;
+  padding: 4px 10px;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.qty-btn {
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 18px;
+  padding: 0 4px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.qty-value {
+  min-width: 14px;
+  text-align: center;
+}
+
+.cart-main-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cart-main-text {
+  margin-left: 4px;
+}
+
+/* mini qty box inside the button */
+.cart-main-btn .qty-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #16a34a;
+  border-radius: 999px;
+  padding: 2px 8px;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.cart-main-btn .qty-btn {
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: 14px;
+  padding: 0 2px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.cart-main-btn .qty-value {
+  min-width: 12px;
+  text-align: center;
+  font-size: 13px;
+}

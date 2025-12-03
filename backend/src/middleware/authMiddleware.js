@@ -1,7 +1,8 @@
+// src/middleware/authMiddleware.js
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-exports.protect = async (req, res, next) => {
+const protect = async (req, res, next) => {
   try {
     let token;
 
@@ -28,13 +29,7 @@ exports.protect = async (req, res, next) => {
         .json({ message: 'Not authorized, user not found' });
     }
 
-    // helpful debug
-    console.log(
-      'AUTH USER:',
-      user._id.toString(),
-      user.email,
-      user.role
-    );
+    console.log('AUTH USER:', user._id.toString(), user.email, user.role);
 
     req.user = user;
     next();
@@ -45,3 +40,5 @@ exports.protect = async (req, res, next) => {
     });
   }
 };
+
+module.exports = protect;

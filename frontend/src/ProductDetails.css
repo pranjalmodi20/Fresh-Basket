@@ -125,3 +125,26 @@
     order: 2;
   }
 }
+
+.pd-description-block {
+  margin-top: 24px;
+}
+
+.pd-desc-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+.pd-desc-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.pd-desc-empty {
+  font-size: 14px;
+  color: #9ca3af;
+}
