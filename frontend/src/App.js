@@ -10,9 +10,8 @@ import { getWishlist, toggleWishlist } from './wishlistApi';
 import CartPage from './CartPage';
 import ProfilePage from './ProfilePage';
 
-const API_URL = 'https://fresh-basket-sno7.onrender.com/api/auth';
-const PRODUCTS_API = 'https://fresh-basket-sno7.onrender.com/api/products';
-
+const API_URL = 'http://localhost:5001/api/auth';
+const PRODUCTS_API = 'http://localhost:5001/api/products';
 
 function App() {
   const [currentView, setCurrentView] = useState('login');
