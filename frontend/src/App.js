@@ -7,6 +7,7 @@ import AdminPanel from './AdminPanel';
 import ProductDetails from './ProductDetails';
 import { setCartQuantity } from './cartApi';
 import { getWishlist, toggleWishlist } from './wishlistApi';
+import CartPage from './CartPage';
 
 const API_URL = 'http://localhost:5001/api/auth';
 const PRODUCTS_API = 'http://localhost:5001/api/products';
@@ -388,22 +389,15 @@ function App() {
           )}
 
           {currentView === 'cart' && (
-            <div className="cart-page">
-              <h2>Cart</h2>
-              {cartItems.length === 0 ? (
-                <p>Your cart is empty.</p>
-              ) : (
-                <ul>
-                  {cartItems.map((item, idx) => (
-                    <li key={idx}>
-                      {item.product.name} – {item.quantity} × ₹
-                      {item.product.price}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
+              <CartPage
+                cartItems={cartItems}
+                onSetCartQuantity={handleSetCartQuantity}
+                onProceed={() => {
+                  showMessage('Proceeding to payment...', 'success');
+                  // TODO: integrate payment gateway
+                }}
+              />
+            )}
 
           {currentView === 'wishlist' && (
             <div className="wishlist-page">
