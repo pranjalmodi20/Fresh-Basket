@@ -8,6 +8,7 @@ import ProductDetails from './ProductDetails';
 import { setCartQuantity } from './cartApi';
 import { getWishlist, toggleWishlist } from './wishlistApi';
 import CartPage from './CartPage';
+import ProfilePage from './ProfilePage';
 
 const API_URL = 'http://localhost:5001/api/auth';
 const PRODUCTS_API = 'http://localhost:5001/api/products';
@@ -37,7 +38,7 @@ function App() {
 
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // Restore session
+  // Restore session -> always go to shop if logged in
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
@@ -45,7 +46,7 @@ function App() {
     if (token && userData) {
       const parsed = JSON.parse(userData);
       setUser(parsed);
-      setCurrentView(parsed.role === 'admin' ? 'dashboard' : 'shop');
+      setCurrentView('shop');
       fetchProducts();
       loadWishlist();
     }
@@ -60,13 +61,6 @@ function App() {
       console.error('Load wishlist error:', err);
     }
   };
-
-  // Safety: if somehow on dashboard but not admin, redirect to shop
-  useEffect(() => {
-    if (currentView === 'dashboard' && user && user.role !== 'admin') {
-      setCurrentView('shop');
-    }
-  }, [currentView, user]);
 
   const handleLoginChange = (e) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
@@ -125,11 +119,8 @@ function App() {
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
 
-        if (data.user.role === 'admin') {
-          setCurrentView('dashboard');
-        } else {
-          setCurrentView('shop');
-        }
+        // Always go to shop after signup
+        setCurrentView('shop');
 
         fetchProducts();
         showMessage(data.message, 'success');
@@ -160,11 +151,8 @@ function App() {
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
 
-        if (data.user.role === 'admin') {
-          setCurrentView('dashboard');
-        } else {
-          setCurrentView('shop');
-        }
+        // Always go to shop after login
+        setCurrentView('shop');
 
         fetchProducts();
         showMessage(data.message, 'success');
@@ -238,6 +226,13 @@ function App() {
       console.error(err);
       showMessage('Could not update wishlist', 'error');
     }
+  };
+
+  // Search se selected product ko cart me 1 qty add karega
+  const handleSearchSelect = (product) => {
+    setSelectedProduct(product);
+    setCurrentView('productDetails');
+    handleSetCartQuantity(product, 1);
   };
 
   const renderLoginForm = () => (
@@ -338,7 +333,7 @@ function App() {
     </div>
   );
 
-  // Dashboard with navbar and view switching
+  // Dashboard with navbar and view switching (but default view is shop)
   const renderDashboard = () => {
     return (
       <>
@@ -347,35 +342,16 @@ function App() {
           onNavigate={setCurrentView}
           onLogout={handleLogout}
           user={user}
+          products={products}
+          onSearchSelect={handleSearchSelect}
         />
 
         <div className="dashboard">
-          {/* Admin-only dashboard hero */}
-          {currentView === 'dashboard' && user?.role === 'admin' && (
-            <section className="dash-hero">
-              <div className="dash-hero-left">
-                <h2 className="dash-hero-title">
-                  Fresh food, delivered fast.
-                </h2>
-                <p className="dash-hero-text">
-                  Browse organic fruits and vegetables from trusted
-                  local vendors and get them delivered to your
-                  doorstep.
-                </p>
-              </div>
-              <div className="dash-hero-right">
-                <img
-                  src="/dashboard-hero.jpg"
-                  alt="Fresh Basket dashboard"
-                  className="dash-hero-image"
-                />
-              </div>
-            </section>
-          )}
-
           {currentView === 'shop' && (
             <Shop
               products={products}
+              onSearch={(results) => setSearchedProducts(results)}
+              onSelectProduct={(product) => onOpenProduct(product)}
               loadingProducts={loadingProducts}
               cartItems={cartItems}
               wishlistItems={wishlistItems}
@@ -389,15 +365,15 @@ function App() {
           )}
 
           {currentView === 'cart' && (
-              <CartPage
-                cartItems={cartItems}
-                onSetCartQuantity={handleSetCartQuantity}
-                onProceed={() => {
-                  showMessage('Proceeding to payment...', 'success');
-                  // TODO: integrate payment gateway
-                }}
-              />
-            )}
+            <CartPage
+              cartItems={cartItems}
+              onSetCartQuantity={handleSetCartQuantity}
+              onProceed={() => {
+                showMessage('Proceeding to payment...', 'success');
+                // TODO: integrate payment gateway
+              }}
+            />
+          )}
 
           {currentView === 'wishlist' && (
             <div className="wishlist-page">
@@ -465,19 +441,10 @@ function App() {
           )}
 
           {currentView === 'profile' && (
-            <div className="profile-page">
-              <h2>Profile</h2>
-              {user && (
-                <>
-                  <p>
-                    <strong>Name:</strong> {user.name}
-                  </p>
-                  <p>
-                    <strong>Email:</strong> {user.email}
-                  </p>
-                </>
-              )}
-            </div>
+            <ProfilePage
+              user={user}
+              onLogout={handleLogout}
+            />
           )}
 
           {currentView === 'admin' && user?.role === 'admin' && (

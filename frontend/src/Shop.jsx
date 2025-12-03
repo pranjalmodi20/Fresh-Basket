@@ -1,13 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import './Shop.css';
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10; // 5 cards x 2 rows = 10 per page
 
 const Shop = ({
   products,
   loadingProducts,
   cartItems,
-  wishlistItems,
   onSetCartQuantity,
   onAddToWishlist,
   onOpenProduct,
@@ -15,7 +14,6 @@ const Shop = ({
   const [activeCategory, setActiveCategory] = useState('all');
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState('default');
-
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const categories = [
@@ -24,11 +22,12 @@ const Shop = ({
   ];
 
   const sliderImages = [
-    { src: '/banner1.jpg', alt: 'Promo banner 1' },
-    { src: '/banner2.jpg', alt: 'Promo banner 2' },
-    { src: '/banner3.jpg', alt: 'Promo banner 3' },
+    { src: '/fruits&veg.png', alt: 'Promo banner 1' },
+    { src: '/freshbasket.png', alt: 'Promo banner 2' },
+    { src: '/freshbasket2.jpg', alt: 'Promo banner 3' },
   ];
 
+  // Auto-change slider every 5s
   useEffect(() => {
     const id = setInterval(() => {
       setCurrentSlide((prev) =>
@@ -39,6 +38,7 @@ const Shop = ({
     return () => clearInterval(id);
   }, [sliderImages.length]);
 
+  // Filter by category
   const filteredProducts = useMemo(() => {
     if (activeCategory === 'all') return products;
     return products.filter(
@@ -46,6 +46,7 @@ const Shop = ({
     );
   }, [products, activeCategory]);
 
+  // Apply sorting
   const sortedProducts = useMemo(() => {
     const list = [...filteredProducts];
 
@@ -63,6 +64,7 @@ const Shop = ({
     return list;
   }, [filteredProducts, sortBy]);
 
+  // Pagination - 10 items per page
   const totalPages = Math.max(
     1,
     Math.ceil(sortedProducts.length / PAGE_SIZE)
@@ -85,7 +87,7 @@ const Shop = ({
 
   return (
     <div className="shop-page">
-      {/* Small header */}
+      {/* Header */}
       <section className="shop-header">
         <p className="shop-hero-kicker">
           Home / {activeCategory === 'all' ? 'Shop' : title}
@@ -93,7 +95,7 @@ const Shop = ({
         <h1 className="shop-hero-title">{title}</h1>
       </section>
 
-      {/* Full-width promo slider */}
+      {/* Slider */}
       <section className="shop-slider">
         <div className="shop-slider-inner">
           <button
@@ -125,18 +127,18 @@ const Shop = ({
           >
             ›
           </button>
-        </div>
 
-        <div className="slider-dots">
-          {sliderImages.map((_, idx) => (
-            <button
-              key={idx}
-              className={`slider-dot ${
-                idx === currentSlide ? 'active' : ''
-              }`}
-              onClick={() => setCurrentSlide(idx)}
-            />
-          ))}
+          <div className="slider-dots">
+            {sliderImages.map((_, idx) => (
+              <button
+                key={idx}
+                className={`slider-dot ${
+                  idx === currentSlide ? 'active' : ''
+                }`}
+                onClick={() => setCurrentSlide(idx)}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -146,7 +148,7 @@ const Shop = ({
         <h2 className="shop-intro-title">Shop Our Organic Products</h2>
       </section>
 
-      {/* Category buttons */}
+      {/* Categories */}
       <section className="shop-categories">
         {categories.map((cat) => (
           <button
@@ -190,7 +192,7 @@ const Shop = ({
         </div>
       </section>
 
-      {/* Products grid */}
+      {/* Products Grid */}
       <section className="shop-products">
         {loadingProducts ? (
           <p>Loading products...</p>
@@ -202,11 +204,6 @@ const Shop = ({
               cartItems?.find(
                 (item) => item.product._id === p._id
               )?.quantity || 0;
-
-            // Check if product is in wishlist
-            const isInWishlist = wishlistItems
-              ? wishlistItems.some((item) => item._id === p._id)
-              : false;
 
             return (
               <article
@@ -220,9 +217,9 @@ const Shop = ({
                     alt={p.name}
                     className="shop-product-img"
                   />
+                  <span className="shop-product-weight">1kg</span>
                 </div>
                 <div className="shop-product-body">
-                  <span className="shop-product-weight">1kg</span>
                   <p className="shop-product-category">{p.category}</p>
                   <h3 className="shop-product-name">{p.name}</h3>
                   <p className="shop-product-price">
@@ -237,16 +234,16 @@ const Shop = ({
                           e.stopPropagation();
                           onSetCartQuantity(p, 1);
                         }}
+                        title="Add to Cart"
                       >
                         <i className="fas fa-shopping-cart" />
-                        <span className="cart-main-text">
-                          Add to Cart
-                        </span>
+                        <span className="cart-main-text">Add to Cart</span>
                       </button>
                     ) : (
                       <button
                         className="shop-btn shop-btn-primary cart-main-btn"
                         onClick={(e) => e.stopPropagation()}
+                        title="Manage quantity"
                       >
                         <span className="qty-control">
                           <button
@@ -269,25 +266,19 @@ const Shop = ({
                             +
                           </button>
                         </span>
-                        <span className="cart-main-text">
-                          Add to Cart
-                        </span>
                       </button>
                     )}
 
                     <button
-                      className={`shop-btn ${
-                        isInWishlist
-                          ? 'shop-btn-wishlist-active'
-                          : 'shop-btn-ghost'
-                      }`}
+                      className="shop-btn shop-btn-ghost"
                       onClick={(e) => {
                         e.stopPropagation();
-                        console.log('Wishlist clicked for product:', p);
                         onAddToWishlist(p);
                       }}
+                      title="Add to Wishlist"
                     >
-                      <i className="fas fa-heart" /> Wishlist
+                      <i className="fas fa-heart" />
+                      <span>Wishlist</span>
                     </button>
                   </div>
                 </div>
@@ -337,3 +328,4 @@ const Shop = ({
 };
 
 export default Shop;
+

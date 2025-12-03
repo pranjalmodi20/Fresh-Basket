@@ -1,16 +1,54 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Navbar.css';
 
-const Navbar = ({ onNavigate, currentView, onLogout, user }) => {
+const Navbar = ({ onNavigate, currentView, onLogout, user, products = [], onSearchSelect }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const filteredProducts =
+    searchTerm.trim().length === 0
+      ? []
+      : products.filter((p) =>
+          (p.name || '').toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setShowSuggestions(value.trim().length > 0);
+  };
+
+  const handleSelectProduct = (product) => {
+    if (!product) return;
+    setSearchTerm(product.name);
+    setShowSuggestions(false);
+    if (onSearchSelect) {
+      onSearchSelect(product); // yahin se parent ko bol: cart me add + details dikhana
+    }
+  };
+
+  const handleBlur = () => {
+    setTimeout(() => setShowSuggestions(false), 150);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (filteredProducts.length > 0) {
+        handleSelectProduct(filteredProducts[0]); // pehla result open
+      }
+    }
+  };
+
   return (
     <header className="fb-navbar">
       <div className="fb-nav-left">
         <div className="fb-logo" onClick={() => onNavigate('dashboard')}>
           <img
-              src="/freshbasketlogo1.png"           
-              alt="Fresh Basket logo"
-              className="fb-logo-img"
-            />
+            src="/freshbasketlogo1.png"
+            alt="Fresh Basket logo"
+            className="fb-logo-img"
+          />
           <div className="fb-logo-text">
             <span className="fb-logo-title"></span>
             <span className="fb-logo-sub"></span>
@@ -27,13 +65,36 @@ const Navbar = ({ onNavigate, currentView, onLogout, user }) => {
       </div>
 
       <div className="fb-nav-center">
-        <input
-          className="fb-search-input"
-          placeholder="Search for fruits, vegetables, juices..."
-        />
+        <div className="fb-search-wrapper">
+          <input
+            className="fb-search-input"
+            placeholder="Search for fruits, vegetables, juices..."
+            value={searchTerm}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            onFocus={() =>
+              setShowSuggestions(searchTerm.trim().length > 0)
+            }
+            onBlur={handleBlur}
+          />
+          {showSuggestions && filteredProducts.length > 0 && (
+            <ul className="fb-search-suggestions show">
+              {filteredProducts.slice(0, 8).map((product) => (
+                <li
+                  key={product._id || product.id}
+                  className="fb-search-suggestion-item"
+                  onMouseDown={() => handleSelectProduct(product)}
+                >
+                  {product.name}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
 
       <div className="fb-nav-right">
+        {/* baaki sab jaisa ka taisa */}
         <button
           className={`fb-nav-link ${
             currentView === 'shop' ? 'active' : ''

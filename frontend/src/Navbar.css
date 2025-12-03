@@ -1,3 +1,5 @@
+/* ---- Existing navbar styles (tumhare paas jo pehle se hain) ---- */
+
 .fb-navbar {
   position: sticky;
   top: 0;
@@ -72,13 +74,89 @@
   justify-content: center;
 }
 
-.fb-search-input {
+/* ---- SEARCH WRAPPER + INPUT ---- */
+
+.fb-search-wrapper {
+  position: relative;
   width: 100%;
   max-width: 460px;
+}
+
+.fb-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+
+.fb-search-input {
+  width: 100%;
   border-radius: 999px;
   border: 1px solid #d1d5db;
-  padding: 8px 14px;
+  padding: 8px 14px 8px 32px; /* left padding zyada for icon */
   font-size: 13px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.fb-search-input:focus {
+  outline: none;
+  border-color: #16a34a;
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.15);
+  transform: translateY(-1px);
+}
+
+/* ---- SEARCH SUGGESTIONS DROPDOWN ---- */
+
+.fb-search-suggestions {
+  position: absolute;
+  top: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 460px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.14);
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 1000;
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 4px 0;
+
+  opacity: 0;
+  transform-origin: top center;
+  transform: translate(-50%, -6px) scale(0.98);
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+/* show class jo JSX me use ki hai */
+.fb-search-suggestions.show {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+  pointer-events: auto;
+}
+
+.fb-search-suggestion-item {
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.15s ease, padding-left 0.15s ease;
+}
+
+.fb-search-suggestion-item:hover {
+  background-color: #f3f4f6;
+  padding-left: 18px;
 }
 
 /* Right: links + logout */
@@ -121,11 +199,98 @@
   cursor: pointer;
 }
 
-
+/* Logo image */
 .fb-logo-img {
-  height: 70px;      /* try 32–48px depending on what you like */
+  height: 70px;
   width: auto;
   object-fit: contain;
   margin-right: -1em;
   margin-left: -2em;
+}
+
+/* ---- RESPONSIVE MEDIA QUERIES ---- */
+
+@media (max-width: 1024px) {
+  .fb-navbar {
+    padding: 8px 16px;
+    gap: 16px;
+  }
+
+  .fb-logo-img {
+    height: 56px;
+    margin-left: -1em;
+  }
+
+  .fb-location-input {
+    min-width: 110px;
+  }
+}
+
+@media (max-width: 768px) {
+  .fb-navbar {
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .fb-nav-left {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .fb-location {
+    display: none; /* space bachane ke liye chhote screen pe hide */
+  }
+
+  .fb-nav-center {
+    order: 3;
+    width: 100%;
+  }
+
+  .fb-search-input {
+    max-width: 100%;
+  }
+
+  .fb-search-suggestions {
+    max-width: 100%;
+  }
+
+  .fb-nav-right {
+    order: 2;
+    margin-left: auto;
+    gap: 4px;
+  }
+
+  .fb-nav-link {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .fb-logout-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .fb-navbar {
+    padding: 8px 10px;
+  }
+
+  .fb-logo-img {
+    height: 46px;
+    margin-left: -0.5em;
+  }
+
+  .fb-nav-right {
+    gap: 2px;
+  }
+
+  .fb-nav-link span {
+    display: none; /* sirf icon chhodo, text hide kar do */
+  }
+
+  .fb-nav-icon {
+    margin-right: 0;
+  }
 }
