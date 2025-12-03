@@ -7,14 +7,15 @@ const Shop = ({
   products,
   loadingProducts,
   cartItems,
+  wishlistItems,
   onSetCartQuantity,
   onAddToWishlist,
   onOpenProduct,
 }) => {
-  const [activeCategory, setActiveCategory] = useState('all'); // 'all' | 'vegetables' | 'fruits'
+  const [activeCategory, setActiveCategory] = useState('all');
   const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState('default');
 
-  // slider state
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const categories = [
@@ -23,12 +24,11 @@ const Shop = ({
   ];
 
   const sliderImages = [
-    { src: '/Fresh.png', alt: 'Promo banner 1' },
+    { src: '/banner1.jpg', alt: 'Promo banner 1' },
     { src: '/banner2.jpg', alt: 'Promo banner 2' },
     { src: '/banner3.jpg', alt: 'Promo banner 3' },
   ];
 
-  // auto‑change slider every 5s
   useEffect(() => {
     const id = setInterval(() => {
       setCurrentSlide((prev) =>
@@ -39,7 +39,6 @@ const Shop = ({
     return () => clearInterval(id);
   }, [sliderImages.length]);
 
-  // Filter by selected category
   const filteredProducts = useMemo(() => {
     if (activeCategory === 'all') return products;
     return products.filter(
@@ -47,17 +46,33 @@ const Shop = ({
     );
   }, [products, activeCategory]);
 
-  // Pagination
+  const sortedProducts = useMemo(() => {
+    const list = [...filteredProducts];
+
+    if (sortBy === 'price-asc') {
+      list.sort((a, b) => (a.price || 0) - (b.price || 0));
+    } else if (sortBy === 'price-desc') {
+      list.sort((a, b) => (b.price || 0) - (a.price || 0));
+    } else if (sortBy === 'name-asc') {
+      list.sort((a, b) =>
+        (a.name || '').localeCompare(b.name || '', 'en', {
+          sensitivity: 'base',
+        })
+      );
+    }
+    return list;
+  }, [filteredProducts, sortBy]);
+
   const totalPages = Math.max(
     1,
-    Math.ceil(filteredProducts.length / PAGE_SIZE)
+    Math.ceil(sortedProducts.length / PAGE_SIZE)
   );
   const currentPage = Math.min(page, totalPages);
   const startIdx = (currentPage - 1) * PAGE_SIZE;
-  const pageItems = filteredProducts.slice(startIdx, startIdx + PAGE_SIZE);
+  const pageItems = sortedProducts.slice(startIdx, startIdx + PAGE_SIZE);
 
   const handleCategoryClick = (key) => {
-    setActiveCategory((prev) => (prev === key ? 'all' : key)); // toggle
+    setActiveCategory((prev) => (prev === key ? 'all' : key));
     setPage(1);
   };
 
@@ -70,7 +85,7 @@ const Shop = ({
 
   return (
     <div className="shop-page">
-      {/* Small header instead of big hero */}
+      {/* Small header */}
       <section className="shop-header">
         <p className="shop-hero-kicker">
           Home / {activeCategory === 'all' ? 'Shop' : title}
@@ -156,13 +171,21 @@ const Shop = ({
       {/* Toolbar */}
       <section className="shop-toolbar">
         <p className="shop-toolbar-count">
-          Showing {pageItems.length} of {filteredProducts.length} items
+          Showing {pageItems.length} of {sortedProducts.length} items
         </p>
         <div className="shop-toolbar-right">
-          <select className="shop-sort-select" defaultValue="default">
+          <select
+            className="shop-sort-select"
+            value={sortBy}
+            onChange={(e) => {
+              setSortBy(e.target.value);
+              setPage(1);
+            }}
+          >
             <option value="default">Default Sorting</option>
             <option value="price-asc">Price: Low to High</option>
             <option value="price-desc">Price: High to Low</option>
+            <option value="name-asc">Name: A to Z</option>
           </select>
         </div>
       </section>
@@ -179,6 +202,11 @@ const Shop = ({
               cartItems?.find(
                 (item) => item.product._id === p._id
               )?.quantity || 0;
+
+            // Check if product is in wishlist
+            const isInWishlist = wishlistItems
+              ? wishlistItems.some((item) => item._id === p._id)
+              : false;
 
             return (
               <article
@@ -201,53 +229,67 @@ const Shop = ({
                     Actual Price: <span>₹{p.price}</span>
                   </p>
 
-                    <div className="shop-product-actions">
+                  <div className="shop-product-actions">
+                    {qty === 0 ? (
                       <button
                         className="shop-btn shop-btn-primary cart-main-btn"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (qty === 0) {
-                            onSetCartQuantity(p, 1);
-                          }
+                          onSetCartQuantity(p, 1);
                         }}
                       >
-                        {qty === 0 ? (
-                          <i className="fas fa-shopping-cart" />
-                        ) : (
-                          <span
-                            className="qty-control"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <button
-                              type="button"
-                              className="qty-btn"
-                              onClick={() => onSetCartQuantity(p, qty - 1)}
-                            >
-                              −
-                            </button>
-                            <span className="qty-value">{qty}</span>
-                            <button
-                              type="button"
-                              className="qty-btn"
-                              onClick={() => onSetCartQuantity(p, qty + 1)}
-                            >
-                              +
-                            </button>
-                          </span>
-                        )}
-                        <span className="cart-main-text">Add to Cart</span>
+                        <i className="fas fa-shopping-cart" />
+                        <span className="cart-main-text">
+                          Add to Cart
+                        </span>
                       </button>
-
+                    ) : (
                       <button
-                        className="shop-btn shop-btn-ghost"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onAddToWishlist(p);
-                        }}
+                        className="shop-btn shop-btn-primary cart-main-btn"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        <i className="fas fa-heart" /> Wishlist
+                        <span className="qty-control">
+                          <button
+                            type="button"
+                            className="qty-btn"
+                            onClick={() =>
+                              onSetCartQuantity(p, qty - 1)
+                            }
+                          >
+                            −
+                          </button>
+                          <span className="qty-value">{qty}</span>
+                          <button
+                            type="button"
+                            className="qty-btn"
+                            onClick={() =>
+                              onSetCartQuantity(p, qty + 1)
+                            }
+                          >
+                            +
+                          </button>
+                        </span>
+                        <span className="cart-main-text">
+                          Add to Cart
+                        </span>
                       </button>
-                    </div>
+                    )}
+
+                    <button
+                      className={`shop-btn ${
+                        isInWishlist
+                          ? 'shop-btn-wishlist-active'
+                          : 'shop-btn-ghost'
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('Wishlist clicked for product:', p);
+                        onAddToWishlist(p);
+                      }}
+                    >
+                      <i className="fas fa-heart" /> Wishlist
+                    </button>
+                  </div>
                 </div>
               </article>
             );
@@ -256,7 +298,7 @@ const Shop = ({
       </section>
 
       {/* Pagination */}
-      {filteredProducts.length > PAGE_SIZE && (
+      {sortedProducts.length > PAGE_SIZE && (
         <section className="shop-pagination">
           <button
             className="page-btn"

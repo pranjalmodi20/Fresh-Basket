@@ -29,7 +29,6 @@ const protect = async (req, res, next) => {
         .json({ message: 'Not authorized, user not found' });
     }
 
-    console.log('AUTH USER:', user._id.toString(), user.email, user.role);
 
     req.user = user;
     next();

@@ -1,7 +1,12 @@
 import React from 'react';
 import './ProductDetails.css';
 
-const ProductDetails = ({ product, onAddToCart, onBack }) => {
+const ProductDetails = ({
+  product,
+  cartItems,
+  onSetCartQuantity,
+  onBack,
+}) => {
   if (!product) {
     return (
       <div className="product-details-page">
@@ -12,6 +17,9 @@ const ProductDetails = ({ product, onAddToCart, onBack }) => {
       </div>
     );
   }
+
+  const qty =
+    cartItems?.find((item) => item.product._id === product._id)?.quantity || 0;
 
   return (
     <div className="product-details-page">
@@ -34,14 +42,42 @@ const ProductDetails = ({ product, onAddToCart, onBack }) => {
           <p className="pd-category">{product.category}</p>
           <p className="pd-price">₹{product.price}</p>
 
-          <button
-            className="shop-btn shop-btn-primary"
-            onClick={() => onAddToCart(product)}
-          >
-            <i className="fas fa-shopping-cart" /> Add to cart
-          </button>
+          {/* Same add-to-cart behaviour as Shop */}
+          {qty === 0 ? (
+            <button
+              className="shop-btn shop-btn-primary cart-main-btn"
+              onClick={() => onSetCartQuantity(product, 1)}
+            >
+              <i className="fas fa-shopping-cart" />
+              <span className="cart-main-text">Add to Cart</span>
+            </button>
+          ) : (
+            <button
+              className="shop-btn shop-btn-primary cart-main-btn"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="qty-control">
+                <button
+                  type="button"
+                  className="qty-btn"
+                  onClick={() => onSetCartQuantity(product, qty - 1)}
+                >
+                  −
+                </button>
+                <span className="qty-value">{qty}</span>
+                <button
+                  type="button"
+                  className="qty-btn"
+                  onClick={() => onSetCartQuantity(product, qty + 1)}
+                >
+                  +
+                </button>
+              </span>
+              <span className="cart-main-text">Add to Cart</span>
+            </button>
+          )}
 
-          {/* NEW: description block */}
+          {/* Description block */}
           <div className="pd-description-block">
             <h3 className="pd-desc-title">Description</h3>
             {product.description ? (

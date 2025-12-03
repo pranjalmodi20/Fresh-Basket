@@ -6,6 +6,7 @@ import Footer from './Footer';
 import AdminPanel from './AdminPanel';
 import ProductDetails from './ProductDetails';
 import { setCartQuantity } from './cartApi';
+import { getWishlist, toggleWishlist } from './wishlistApi';
 
 const API_URL = 'http://localhost:5001/api/auth';
 const PRODUCTS_API = 'http://localhost:5001/api/products';
@@ -45,8 +46,19 @@ function App() {
       setUser(parsed);
       setCurrentView(parsed.role === 'admin' ? 'dashboard' : 'shop');
       fetchProducts();
+      loadWishlist();
     }
   }, []);
+
+  const loadWishlist = async () => {
+    try {
+      const items = await getWishlist();
+      // items is already an array of products from backend
+      setWishlistItems(items);
+    } catch (err) {
+      console.error('Load wishlist error:', err);
+    }
+  };
 
   // Safety: if somehow on dashboard but not admin, redirect to shop
   useEffect(() => {
@@ -208,6 +220,25 @@ function App() {
     }
   };
 
+  // Handle wishlist add/remove
+  const handleAddToWishlist = async (product) => {
+    try {
+      await toggleWishlist(product._id);
+
+      setWishlistItems((prev) => {
+        const exists = prev.find((item) => item._id === product._id);
+        if (exists) {
+          return prev.filter((item) => item._id !== product._id);
+        } else {
+          return [...prev, product];
+        }
+      });
+    } catch (err) {
+      console.error(err);
+      showMessage('Could not update wishlist', 'error');
+    }
+  };
+
   const renderLoginForm = () => (
     <div className="form-container">
       <h2>Login</h2>
@@ -308,8 +339,6 @@ function App() {
 
   // Dashboard with navbar and view switching
   const renderDashboard = () => {
-    console.log('currentView:', currentView, 'user role:', user?.role);
-
     return (
       <>
         <Navbar
@@ -348,10 +377,9 @@ function App() {
               products={products}
               loadingProducts={loadingProducts}
               cartItems={cartItems}
+              wishlistItems={wishlistItems}
               onSetCartQuantity={handleSetCartQuantity}
-              onAddToWishlist={(p) =>
-                setWishlistItems((prev) => [...prev, p])
-              }
+              onAddToWishlist={handleAddToWishlist}
               onOpenProduct={(p) => {
                 setSelectedProduct(p);
                 setCurrentView('productDetails');
@@ -360,7 +388,7 @@ function App() {
           )}
 
           {currentView === 'cart' && (
-            <div>
+            <div className="cart-page">
               <h2>Cart</h2>
               {cartItems.length === 0 ? (
                 <p>Your cart is empty.</p>
@@ -378,24 +406,72 @@ function App() {
           )}
 
           {currentView === 'wishlist' && (
-            <div>
-              <h2>Wishlist</h2>
+            <div className="wishlist-page">
+              <div className="wishlist-header">
+                <h1 className="wishlist-title">My Wishlist</h1>
+                <p className="wishlist-count">
+                  {wishlistItems.length} items
+                </p>
+              </div>
+
               {wishlistItems.length === 0 ? (
-                <p>No items in wishlist.</p>
+                <div className="wishlist-empty">
+                  <p>No items in your wishlist yet.</p>
+                </div>
               ) : (
-                <ul>
-                  {wishlistItems.map((item, idx) => (
-                    <li key={idx}>
-                      {item.name} – ₹{item.price}
-                    </li>
+                <div className="wishlist-grid">
+                  {wishlistItems.map((product) => (
+                    <article
+                      key={product._id}
+                      className="wishlist-product-card"
+                    >
+                      <div className="wishlist-product-image">
+                        <img
+                          src={product.imageUrl}
+                          alt={product.name}
+                          className="wishlist-product-img"
+                        />
+                        <button
+                          className="wishlist-remove-btn"
+                          onClick={() => handleAddToWishlist(product)}
+                          title="Remove from Wishlist"
+                        >
+                          <i className="fas fa-heart"></i>
+                        </button>
+                      </div>
+                      <div className="wishlist-product-body">
+                        <span className="wishlist-product-weight">1kg</span>
+                        <p className="wishlist-product-category">
+                          {product.category}
+                        </p>
+                        <h3 className="wishlist-product-name">
+                          {product.name}
+                        </h3>
+                        <p className="wishlist-product-price">
+                          ₹{product.price}
+                        </p>
+
+                        <div className="wishlist-product-actions">
+                          <button
+                            className="shop-btn shop-btn-primary"
+                            onClick={() =>
+                              handleSetCartQuantity(product, 1)
+                            }
+                          >
+                            <i className="fas fa-shopping-cart" /> Add to
+                            Cart
+                          </button>
+                        </div>
+                      </div>
+                    </article>
                   ))}
-                </ul>
+                </div>
               )}
             </div>
           )}
 
           {currentView === 'profile' && (
-            <div>
+            <div className="profile-page">
               <h2>Profile</h2>
               {user && (
                 <>
@@ -417,7 +493,8 @@ function App() {
           {currentView === 'productDetails' && selectedProduct && (
             <ProductDetails
               product={selectedProduct}
-              onAddToCart={(p) => handleSetCartQuantity(p, 1)}
+              cartItems={cartItems}
+              onSetCartQuantity={handleSetCartQuantity}
               onBack={() => setCurrentView('shop')}
             />
           )}

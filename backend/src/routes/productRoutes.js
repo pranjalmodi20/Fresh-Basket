@@ -5,13 +5,6 @@ const router = express.Router();
 const Product = require('../models/Product');
 const protect = require('../middleware/authMiddleware'); // default export
 
-// optional debug
-console.log('typeof protect (productRoutes):', typeof protect);
-
-// Example controllers inline, ya alag controller file se import kar sakta hai
-// yaha simple version de raha hoon:
-
-// GET all products (public)
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
