@@ -1,15 +1,53 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import './Shop.css';
 
+const PAGE_SIZE = 20;
+
 const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
+  const [activeCategory, setActiveCategory] = useState('all'); // 'all' | 'vegetables' | 'fruits'
+  const [page, setPage] = useState(1);
+
+  const categories = [
+    { key: 'vegetables', label: 'Vegetables', img: '/veg.jpg' },
+    { key: 'fruits', label: 'Fruits', img: '/fruits.jpg' },
+  ];
+
+  // Filter by category
+  const filteredProducts = useMemo(() => {
+    if (activeCategory === 'all') return products;
+    return products.filter(
+      (p) => p.category?.toLowerCase() === activeCategory
+    );
+  }, [products, activeCategory]);
+
+  // Pagination data
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const startIdx = (currentPage - 1) * PAGE_SIZE;
+  const pageItems = filteredProducts.slice(startIdx, startIdx + PAGE_SIZE);
+
+  const handleCategoryClick = (key) => {
+    setActiveCategory(key);
+    setPage(1); // reset to first page when switching category
+  };
+
+  const title =
+    activeCategory === 'vegetables'
+      ? 'Vegetables'
+      : activeCategory === 'fruits'
+      ? 'Fruits'
+      : 'Shop';
+
   return (
     <div className="shop-page">
       {/* Hero banner */}
       <section className="shop-hero">
         <div className="shop-hero-overlay" />
         <div className="shop-hero-content">
-          <p className="shop-hero-kicker">Home / Shop</p>
-          <h1 className="shop-hero-title">Shop</h1>
+          <p className="shop-hero-kicker">
+            Home / {activeCategory === 'all' ? 'Shop' : title}
+          </p>
+          <h1 className="shop-hero-title">{title}</h1>
         </div>
       </section>
 
@@ -19,12 +57,24 @@ const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
         <h2 className="shop-intro-title">Shop Our Organic Products</h2>
       </section>
 
-      {/* Category row */}
+      {/* Category “pages” */}
       <section className="shop-categories">
-        {['Vegetables', 'Fruits'].map((label) => (
-          <button key={label} className="shop-category-pill">
-            <div className="shop-category-circle" />
-            <span className="shop-category-text">{label}</span>
+        {categories.map((cat) => (
+          <button
+            key={cat.key}
+            className={`shop-category-pill ${
+              activeCategory === cat.key ? 'active' : ''
+            }`}
+            onClick={() => handleCategoryClick(cat.key)}
+          >
+            <div className="shop-category-circle">
+              <img
+                src={cat.img}
+                alt={cat.label}
+                className="shop-category-img"
+              />
+            </div>
+            <span className="shop-category-text">{cat.label}</span>
           </button>
         ))}
       </section>
@@ -32,7 +82,7 @@ const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
       {/* Toolbar */}
       <section className="shop-toolbar">
         <p className="shop-toolbar-count">
-          Showing 1–{Math.min(products.length, 10)} of {products.length} items
+          Showing {pageItems.length} of {filteredProducts.length} items
         </p>
         <div className="shop-toolbar-right">
           <select className="shop-sort-select" defaultValue="default">
@@ -42,18 +92,19 @@ const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
           </select>
         </div>
       </section>
+
       {/* Products */}
       <section className="shop-products">
         {loadingProducts ? (
           <p>Loading products...</p>
-        ) : products.length === 0 ? (
-          <p>No products available.</p>
+        ) : pageItems.length === 0 ? (
+          <p>No products available in this category.</p>
         ) : (
-          products.map((p) => (
+          pageItems.map((p) => (
             <article key={p._id} className="shop-product-card">
               <div className="shop-product-image">
                 <img
-                  src={p.imageUrl}        // change to p.image if your field name is "image"
+                  src={p.imageUrl}
                   alt={p.name}
                   className="shop-product-img"
                 />
@@ -86,13 +137,40 @@ const Shop = ({ products, loadingProducts, onAddToCart, onAddToWishlist }) => {
       </section>
 
       {/* Pagination */}
-      <section className="shop-pagination">
-        <button className="page-btn active">1</button>
-        <button className="page-btn">2</button>
-        <button className="page-btn">3</button>
-        <span className="page-dots">…</span>
-        <button className="page-btn">25</button>
-      </section>
+      {filteredProducts.length > PAGE_SIZE && (
+        <section className="shop-pagination">
+          <button
+            className="page-btn"
+            disabled={currentPage === 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+          >
+            ‹
+          </button>
+          {Array.from({ length: totalPages }).map((_, idx) => {
+            const pageNum = idx + 1;
+            return (
+              <button
+                key={pageNum}
+                className={`page-btn ${
+                  currentPage === pageNum ? 'active' : ''
+                }`}
+                onClick={() => setPage(pageNum)}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          <button
+            className="page-btn"
+            disabled={currentPage === totalPages}
+            onClick={() =>
+              setPage((p) => Math.min(totalPages, p + 1))
+            }
+          >
+            ›
+          </button>
+        </section>
+      )}
     </div>
   );
 };
