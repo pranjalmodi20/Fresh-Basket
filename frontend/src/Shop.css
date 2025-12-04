@@ -544,29 +544,36 @@ body {
   }
 }
 
-.wishlist-toggle-btn {
-  border: 1px solid #16a34a;
-  background: #ffffff;
+.wishlist-text-btn {
+  width: 100%;
   border-radius: 999px;
-  padding: 6px 10px;
+  padding: 10px 16px;
+  border: 1px solid #16a34a;
+  background-color: #ffffff;
+  color: #16a34a;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #16a34a;
-  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  gap: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.1s ease;
 }
 
-.wishlist-toggle-btn:hover {
+.wishlist-text-btn:hover {
   background-color: #ecfdf3;
-  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25);
+  transform: translateY(-1px);
 }
 
-.wishlist-toggle-btn.active {
+.wishlist-text-btn.active {
   background-color: #16a34a;
   color: #ffffff;
+  box-shadow: 0 3px 10px rgba(22, 163, 74, 0.4);
 }
 
-.wishlist-toggle-btn .fa-heart {
-  font-size: 16px;
+.wishlist-text-btn i {
+  font-size: 14px;
 }

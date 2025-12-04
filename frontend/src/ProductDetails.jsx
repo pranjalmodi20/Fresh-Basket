@@ -6,9 +6,9 @@ const ProductDetails = ({
   cartItems,
   onSetCartQuantity,
   wishlistItems = [],
+  onAddToWishlist,
   onBack,
-
-}) => {
+  }) => {
   if (!product) {
     return (
       <div className="product-details-page">
@@ -22,6 +22,8 @@ const ProductDetails = ({
 
   const qty =
     cartItems?.find((item) => item.product._id === product._id)?.quantity || 0;
+
+  const isWished = wishlistItems.some((item) => item._id === product._id);
 
   return (
     <div className="product-details-page">
@@ -44,40 +46,26 @@ const ProductDetails = ({
           <p className="pd-category">{product.category}</p>
           <p className="pd-price">₹{product.price}</p>
 
-          {/* Same add-to-cart behaviour as Shop */}
-          {qty === 0 ? (
+          {/* small icon row: cart + wishlist */}
+          <div className="pd-icon-row">
             <button
-              className="shop-btn shop-btn-primary cart-main-btn"
-              onClick={() => onSetCartQuantity(product, 1)}
+              className="pd-icon-btn"
+              onClick={() => onSetCartQuantity(product, qty === 0 ? 1 : qty + 1)}
+              title="Add to Cart"
             >
               <i className="fas fa-shopping-cart" />
-              <span className="cart-main-text">Add to Cart</span>
             </button>
-          ) : (
+
             <button
-              className="shop-btn shop-btn-primary cart-main-btn"
-              onClick={(e) => e.stopPropagation()}
+              className={`pd-icon-btn wishlist-icon ${
+                isWished ? 'active' : ''
+              }`}
+              onClick={() => onAddToWishlist(product)}
+              title="Toggle Wishlist"
             >
-              <span className="qty-control">
-                <button
-                  type="button"
-                  className="qty-btn"
-                  onClick={() => onSetCartQuantity(product, qty - 1)}
-                >
-                  −
-                </button>
-                <span className="qty-value">{qty}</span>
-                <button
-                  type="button"
-                  className="qty-btn"
-                  onClick={() => onSetCartQuantity(product, qty + 1)}
-                >
-                  +
-                </button>
-              </span>
-              <span className="cart-main-text">Add to Cart</span>
+              <i className="fas fa-heart" />
             </button>
-          )}
+          </div>
 
           {/* Description block */}
           <div className="pd-description-block">

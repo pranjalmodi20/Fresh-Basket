@@ -459,6 +459,8 @@ function App() {
               cartItems={cartItems}
               onSetCartQuantity={handleSetCartQuantity}
               onBack={() => setCurrentView('shop')}
+              wishlistItems={wishlistItems}
+              onAddToWishlist={handleAddToWishlist}
             />
           )}
         </div>

@@ -149,3 +149,46 @@
   color: #9ca3af;
 }
 
+.pd-icon-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 20px;
+}
+
+.pd-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: none;
+  background-color: #16a34a;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.18s ease, transform 0.12s ease,
+    box-shadow 0.18s ease;
+}
+
+.pd-icon-btn i {
+  font-size: 16px;
+}
+
+.pd-icon-btn:hover {
+  background-color: #15803d;
+  box-shadow: 0 3px 8px rgba(22, 163, 74, 0.35);
+  transform: translateY(-1px);
+}
+
+/* wishlist state */
+.pd-icon-btn.wishlist-icon {
+  background-color: #ffffff;
+  color: #16a34a;
+  border: 1px solid #16a34a;
+}
+
+.pd-icon-btn.wishlist-icon.active {
+  background-color: #16a34a;
+  color: #ffffff;
+}

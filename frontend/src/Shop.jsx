@@ -1,12 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import './Shop.css';
 
-const PAGE_SIZE = 10; 
+const PAGE_SIZE = 10;
 
 const Shop = ({
   products,
   loadingProducts,
   cartItems,
+  wishlistItems = [],
   onSetCartQuantity,
   onAddToWishlist,
   onOpenProduct,
@@ -87,8 +88,6 @@ const Shop = ({
 
   return (
     <div className="shop-page">
-      {/* Header */}
-
       {/* Slider */}
       <section className="shop-slider">
         <div className="shop-slider-inner">
@@ -199,6 +198,10 @@ const Shop = ({
                 (item) => item.product._id === p._id
               )?.quantity || 0;
 
+            const isWished = wishlistItems.some(
+              (item) => item._id === p._id
+            );
+
             return (
               <article
                 key={p._id}
@@ -264,12 +267,14 @@ const Shop = ({
                     )}
 
                     <button
-                      className="shop-btn shop-btn-ghost"
+                      className={`wishlist-text-btn ${
+                        isWished ? 'active' : ''
+                      }`}
                       onClick={(e) => {
                         e.stopPropagation();
                         onAddToWishlist(p);
                       }}
-                      title="Add to Wishlist"
+                      title="Toggle Wishlist"
                     >
                       <i className="fas fa-heart" />
                       <span>Wishlist</span>
@@ -322,4 +327,3 @@ const Shop = ({
 };
 
 export default Shop;
-
