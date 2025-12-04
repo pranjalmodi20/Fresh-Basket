@@ -58,12 +58,16 @@ function App() {
   const loadCart = async () => {
     try {
       const cartData = await getCart();
+      console.log('Cart loaded from database:', cartData);
       // cartData.items is array of { product, quantity }
       if (cartData && cartData.items) {
         setCartItems(cartData.items);
+      } else {
+        setCartItems([]);
       }
     } catch (err) {
       console.error('Load cart error:', err);
+      setCartItems([]);
     }
   };
 
@@ -206,29 +210,9 @@ function App() {
 
     try {
       await setCartQuantity(product._id, quantity);
-
-      setCartItems((prev) => {
-        const existing = prev.find(
-          (item) => item.product._id === product._id
-        );
-        if (!existing && quantity === 0) return prev;
-
-        if (!existing) {
-          return [...prev, { product, quantity }];
-        }
-
-        if (quantity === 0) {
-          return prev.filter(
-            (item) => item.product._id !== product._id
-          );
-        }
-
-        return prev.map((item) =>
-          item.product._id === product._id
-            ? { ...item, quantity }
-            : item
-        );
-      });
+      
+      // Reload cart from database to get populated product details
+      await loadCart();
     } catch (err) {
       console.error(err);
       showMessage('Could not update cart', 'error');
