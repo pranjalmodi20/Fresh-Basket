@@ -59,6 +59,14 @@ function App() {
     try {
       const cartData = await getCart();
       console.log('Cart loaded from database:', cartData);
+      
+      // Debug: Check if products are populated
+      if (cartData && cartData.items && cartData.items.length > 0) {
+        console.log('First cart item:', cartData.items[0]);
+        console.log('Product in first item:', cartData.items[0].product);
+        console.log('Is product populated?', typeof cartData.items[0].product === 'object' && cartData.items[0].product.name);
+      }
+      
       // cartData.items is array of { product, quantity }
       if (cartData && cartData.items) {
         setCartItems(cartData.items);

@@ -5,7 +5,10 @@ const CartPage = ({ cartItems, onSetCartQuantity, onProceed }) => {
   // Calculate totals
   const calculations = useMemo(() => {
     const itemsTotal = cartItems.reduce(
-      (sum, item) => sum + item.product.price * item.quantity,
+      (sum, item) => {
+        const price = item.product?.price || 0;
+        return sum + price * item.quantity;
+      },
       0
     );
     const gst = Math.round(itemsTotal * 0.05); // 5% GST
@@ -24,6 +27,15 @@ const CartPage = ({ cartItems, onSetCartQuantity, onProceed }) => {
       grandTotal,
       itemCount: cartItems.reduce((sum, item) => sum + item.quantity, 0),
     };
+  }, [cartItems]);
+
+  // Debug logging
+  React.useEffect(() => {
+    console.log('CartPage received cartItems:', cartItems);
+    if (cartItems.length > 0) {
+      console.log('First cart item structure:', cartItems[0]);
+      console.log('First product:', cartItems[0].product);
+    }
   }, [cartItems]);
 
   if (cartItems.length === 0) {
@@ -62,73 +74,83 @@ const CartPage = ({ cartItems, onSetCartQuantity, onProceed }) => {
 
           {/* Cart Items */}
           <div className="cart-items-list">
-            {cartItems.map((item) => (
-              <div key={item.product._id} className="cart-item">
-                <div className="cart-item-image">
-                  <img
-                    src={item.product.imageUrl}
-                    alt={item.product.name}
-                  />
-                </div>
+            {cartItems.map((item) => {
+              // Handle both populated and non-populated products
+              const product = item.product || {};
+              const productId = product._id || item.product;
+              const productName = product.name || 'Product';
+              const productImage = product.imageUrl || '/placeholder.jpg';
+              const productCategory = product.category || 'Unknown';
+              const productPrice = product.price || 0;
 
-                <div className="cart-item-details">
-                  <h4 className="cart-item-name">
-                    {item.product.name}
-                  </h4>
-                  <p className="cart-item-desc">
-                    {item.product.category}
-                  </p>
-                  <p className="cart-item-qty">
-                    {item.quantity} piece
-                    {item.quantity > 1 ? 's' : ''}
-                  </p>
-                </div>
+              return (
+                <div key={productId} className="cart-item">
+                  <div className="cart-item-image">
+                    <img
+                      src={productImage}
+                      alt={productName}
+                    />
+                  </div>
 
-                <div className="cart-item-price">
-                  <p className="price">
-                    ₹
-                    {Math.round(
-                      item.product.price * item.quantity
-                    )}
-                  </p>
-                  <p className="original-price">
-                    ₹
-                    {Math.round(
-                      Math.round(item.product.price * 1.15) *
-                        item.quantity
-                    )}
-                  </p>
-                </div>
+                  <div className="cart-item-details">
+                    <h4 className="cart-item-name">
+                      {productName}
+                    </h4>
+                    <p className="cart-item-desc">
+                      {productCategory}
+                    </p>
+                    <p className="cart-item-qty">
+                      {item.quantity} piece
+                      {item.quantity > 1 ? 's' : ''}
+                    </p>
+                  </div>
 
-                <div className="cart-item-quantity">
-                  <button
-                    className="qty-btn"
-                    onClick={() =>
-                      onSetCartQuantity(
-                        item.product,
-                        item.quantity - 1
-                      )
-                    }
-                  >
-                    −
-                  </button>
-                  <span className="qty-value">
-                    {item.quantity}
-                  </span>
-                  <button
-                    className="qty-btn"
-                    onClick={() =>
-                      onSetCartQuantity(
-                        item.product,
-                        item.quantity + 1
-                      )
-                    }
-                  >
-                    +
-                  </button>
+                  <div className="cart-item-price">
+                    <p className="price">
+                      ₹
+                      {Math.round(
+                        productPrice * item.quantity
+                      )}
+                    </p>
+                    <p className="original-price">
+                      ₹
+                      {Math.round(
+                        Math.round(productPrice * 1.15) *
+                          item.quantity
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="cart-item-quantity">
+                    <button
+                      className="qty-btn"
+                      onClick={() =>
+                        onSetCartQuantity(
+                          product,
+                          item.quantity - 1
+                        )
+                      }
+                    >
+                      −
+                    </button>
+                    <span className="qty-value">
+                      {item.quantity}
+                    </span>
+                    <button
+                      className="qty-btn"
+                      onClick={() =>
+                        onSetCartQuantity(
+                          product,
+                          item.quantity + 1
+                        )
+                      }
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Cancellation Policy */}
