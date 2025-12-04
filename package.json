@@ -1,0 +1,16 @@
+{
+  "name": "fresh-basket",
+  "version": "1.0.0",
+  "description": "Fresh Basket - Online Fruits & Vegetables Store",
+  "scripts": {
+    "dev": "echo 'Please run backend and frontend separately:' && echo 'Terminal 1: cd backend && npm run dev' && echo 'Terminal 2: cd frontend && npm start'",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && npm start",
+    "build:frontend": "cd frontend && npm run build",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install"
+  },
+  "keywords": ["ecommerce", "fruits", "vegetables"],
+  "author": "",
+  "license": "ISC"
+}
