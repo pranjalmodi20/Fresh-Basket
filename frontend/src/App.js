@@ -5,7 +5,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import AdminPanel from './AdminPanel';
 import ProductDetails from './ProductDetails';
-import { setCartQuantity } from './cartApi';
+import { setCartQuantity, getCart } from './cartApi';
 import { getWishlist, toggleWishlist } from './wishlistApi';
 import CartPage from './CartPage';
 import ProfilePage from './ProfilePage';
@@ -50,9 +50,22 @@ function App() {
       setUser(parsed);
       setCurrentView('shop');
       fetchProducts();
+      loadCart();
       loadWishlist();
     }
   }, []);
+
+  const loadCart = async () => {
+    try {
+      const cartData = await getCart();
+      // cartData.items is array of { product, quantity }
+      if (cartData && cartData.items) {
+        setCartItems(cartData.items);
+      }
+    } catch (err) {
+      console.error('Load cart error:', err);
+    }
+  };
 
   const loadWishlist = async () => {
     try {
@@ -135,6 +148,8 @@ function App() {
         setUser(data.user);
         setCurrentView('shop');
         fetchProducts();
+        loadCart();
+        loadWishlist();
         showMessage(data.message, 'success');
       } else {
         showMessage(data.message || 'Signup failed', 'error');
@@ -162,9 +177,10 @@ function App() {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
-          setCurrentView('shop');
-
+        setCurrentView('shop');
         fetchProducts();
+        loadCart();
+        loadWishlist();
         showMessage(data.message, 'success');
       } else {
         showMessage(data.message || 'Login failed', 'error');

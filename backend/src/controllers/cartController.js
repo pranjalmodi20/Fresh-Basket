@@ -2,6 +2,28 @@
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
 
+// GET cart for logged-in user
+const getCart = async (req, res) => {
+  try {
+    const userId = req.user && req.user._id;
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    const cart = await Cart.findOne({ user: userId }).populate('items.product');
+
+    if (!cart) {
+      return res.json({ items: [] });
+    }
+
+    return res.json(cart);
+  } catch (err) {
+    console.error('getCart error:', err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
 const setCartQuantity = async (req, res) => {
   try {
     // user set by protect middleware
@@ -43,7 +65,13 @@ const setCartQuantity = async (req, res) => {
       cart.items[idx].quantity = quantity;
     }
 
-    await cart.save();
+    const savedCart = await cart.save();
+    console.log('Cart saved successfully:', {
+      userId,
+      productId,
+      quantity,
+      totalItems: savedCart.items.length
+    });
 
     const updated =
       cart.items.find((i) => i.product.toString() === productId) || null;
@@ -51,6 +79,7 @@ const setCartQuantity = async (req, res) => {
     return res.json({
       productId,
       quantity: updated ? updated.quantity : 0,
+      cartId: savedCart._id
     });
   } catch (err) {
     console.error('setCartQuantity error:', err);
@@ -58,4 +87,4 @@ const setCartQuantity = async (req, res) => {
   }
 };
 
-module.exports = { setCartQuantity };
+module.exports = { setCartQuantity, getCart };
