@@ -199,7 +199,7 @@ const Shop = ({
               )?.quantity || 0;
 
             const isWished = Array.isArray(wishlistItems) &&
-             wishlistItems.some((item) => item && item._id === p._id);
+              wishlistItems.some((item) => item && item._id && item._id === p._id);
 
             return (
               <article

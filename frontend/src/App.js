@@ -82,10 +82,16 @@ function App() {
   const loadWishlist = async () => {
     try {
       const items = await getWishlist();
+      console.log('Wishlist loaded:', items);
       // items is already an array of products from backend
-      setWishlistItems(items);
+      // Filter out any null or invalid products
+      const validItems = Array.isArray(items) 
+        ? items.filter(item => item && item._id)
+        : [];
+      setWishlistItems(validItems);
     } catch (err) {
       console.error('Load wishlist error:', err);
+      setWishlistItems([]);
     }
   };
 
@@ -350,7 +356,7 @@ function App() {
       </p>
     </div>
   );
-
+  
   // Dashboard with navbar and view switching
   const renderDashboard = () => {
     return (
@@ -408,51 +414,53 @@ function App() {
                 </div>
               ) : (
                 <div className="wishlist-grid">
-                  {wishlistItems.map((product) => (
-                    <article
-                      key={product._id}
-                      className="wishlist-product-card"
-                    >
-                      <div className="wishlist-product-image">
-                        <img
-                          src={product?.imageUrl || '/placeholder.jpg'}
-                          alt={product?.name || 'Product'}
-                          className="wishlist-product-img"
-                        />
-                        <button
-                          className="wishlist-remove-btn"
-                          onClick={() => handleAddToWishlist(product)}
-                          title="Remove from Wishlist"
-                        >
-                          <i className="fas fa-heart"></i>
-                        </button>
-                      </div>
-                      <div className="wishlist-product-body">
-                        <span className="wishlist-product-weight">1kg</span>
-                        <p className="wishlist-product-category">
-                          {product.category}
-                        </p>
-                        <h3 className="wishlist-product-name">
-                          {product.name}
-                        </h3>
-                        <p className="wishlist-product-price">
-                          ₹{product.price}
-                        </p>
-
-                        <div className="wishlist-product-actions">
+                  {wishlistItems
+                    .filter((product) => product && product._id)
+                    .map((product) => (
+                      <article
+                        key={product._id}
+                        className="wishlist-product-card"
+                      >
+                        <div className="wishlist-product-image">
+                          <img
+                            src={product?.imageUrl || '/placeholder.jpg'}
+                            alt={product?.name || 'Product'}
+                            className="wishlist-product-img"
+                          />
                           <button
-                            className="shop-btn shop-btn-primary"
-                            onClick={() =>
-                              handleSetCartQuantity(product, 1)
-                            }
+                            className="wishlist-remove-btn"
+                            onClick={() => handleAddToWishlist(product)}
+                            title="Remove from Wishlist"
                           >
-                            <i className="fas fa-shopping-cart" /> Add to
-                            Cart
+                            <i className="fas fa-heart"></i>
                           </button>
                         </div>
-                      </div>
-                    </article>
-                  ))}
+                        <div className="wishlist-product-body">
+                          <span className="wishlist-product-weight">1kg</span>
+                          <p className="wishlist-product-category">
+                            {product?.category || 'Unknown'}
+                          </p>
+                          <h3 className="wishlist-product-name">
+                            {product?.name || 'Product'}
+                          </h3>
+                          <p className="wishlist-product-price">
+                            ₹{product?.price || 0}
+                          </p>
+
+                          <div className="wishlist-product-actions">
+                            <button
+                              className="shop-btn shop-btn-primary"
+                              onClick={() =>
+                                handleSetCartQuantity(product, 1)
+                              }
+                            >
+                              <i className="fas fa-shopping-cart" /> Add to
+                              Cart
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    ))}
                 </div>
               )}
             </div>
