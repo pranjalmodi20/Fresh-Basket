@@ -1,5 +1,7 @@
 // src/cartApi.js
-const CART_API = 'http://localhost:5001/api/cart';
+const CART_API = process.env.REACT_APP_API_URL 
+  ? `${process.env.REACT_APP_API_URL}/api/cart`
+  : 'https://fresh-basket-sno7.onrender.com/api/cart';
 
 export async function setCartQuantity(productId, quantity) {
   const token = localStorage.getItem('token');

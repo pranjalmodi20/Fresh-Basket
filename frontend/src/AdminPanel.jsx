@@ -60,7 +60,8 @@ const AdminPanel = ({ products, onRefresh }) => {
 
       const method = editingId ? 'PUT' : 'POST';
 
-      const res = await fetch(`http://localhost:5001${endpoint}`, {
+      const baseUrl = process.env.REACT_APP_API_URL || 'https://fresh-basket-sno7.onrender.com';
+      const res = await fetch(`${baseUrl}${endpoint}`, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -89,8 +90,9 @@ const AdminPanel = ({ products, onRefresh }) => {
     if (!window.confirm('Delete this product?')) return;
     try {
       setLoading(true);
+      const baseUrl = process.env.REACT_APP_API_URL || 'https://fresh-basket-sno7.onrender.com';
       const res = await fetch(
-        `http://localhost:5001/api/products/${id}`,
+        `${baseUrl}/api/products/${id}`,
         {
           method: 'DELETE',
           headers: {

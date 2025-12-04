@@ -1,5 +1,7 @@
 // src/wishlistApi.js
-const WISHLIST_API = 'http://localhost:5001/api/wishlist';
+const WISHLIST_API = process.env.REACT_APP_API_URL 
+  ? `${process.env.REACT_APP_API_URL}/api/wishlist`
+  : 'https://fresh-basket-sno7.onrender.com/api/wishlist';
 
 export async function getWishlist() {
   const token = localStorage.getItem('token');

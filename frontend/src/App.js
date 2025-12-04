@@ -10,8 +10,10 @@ import { getWishlist, toggleWishlist } from './wishlistApi';
 import CartPage from './CartPage';
 import ProfilePage from './ProfilePage';
 
-const API_URL = 'http://localhost:5001/api/auth';
-const PRODUCTS_API = 'http://localhost:5001/api/products';
+const API_URL = process.env.REACT_APP_API_URL || 'https://fresh-basket-sno7.onrender.com/api/auth';
+const PRODUCTS_API = process.env.REACT_APP_API_URL 
+  ? `${process.env.REACT_APP_API_URL}/api/products`
+  : 'https://fresh-basket-sno7.onrender.com/api/products';
 
 function App() {
   const [currentView, setCurrentView] = useState('login');
