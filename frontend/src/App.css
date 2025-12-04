@@ -377,3 +377,140 @@ button {
     opacity: 0;
   }
 }
+
+/* main page container animation */
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  /* page transition */
+  animation: page-fade-in 0.35s ease-out;
+}
+
+/* dashboard content (Shop / Cart / Wishlist / Profile / Admin) */
+.dashboard {
+  animation: page-slide-up 0.35s ease-out;
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes page-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* product / wishlist / admin cards */
+.shop-product-card,
+.wishlist-product-card,
+.admin-product-card {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.shop-product-card:hover,
+.wishlist-product-card:hover,
+.admin-product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+}
+
+/* global button hover */
+button,
+.shop-btn,
+.fb-nav-link,
+.fb-logout-btn,
+.page-btn {
+  transition: background-color 0.18s ease, color 0.18s ease,
+    box-shadow 0.18s ease, transform 0.12s ease, border-color 0.18s ease;
+}
+
+button:hover,
+.shop-btn:hover,
+.fb-nav-link:hover,
+.fb-logout-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* navbar smooth hover already mostly set, just ensure icons */
+.fb-nav-link .fb-nav-icon {
+  transition: transform 0.15s ease;
+}
+
+.fb-nav-link:hover .fb-nav-icon {
+  transform: translateY(-1px);
+}
+
+.slider-image {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.shop-slider-inner {
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+/* when slide changes, thoda zoom-in effect */
+.shop-slider-inner .slider-image {
+  animation: slider-zoom 5s ease-in-out infinite;
+}
+
+@keyframes slider-zoom {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* arrows + dots */
+.slider-arrow {
+  transition: background-color 0.18s ease, transform 0.12s ease, box-shadow 0.18s ease;
+}
+
+.slider-arrow:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.25);
+}
+
+.slider-dot {
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.slider-dot.active {
+  transform: scale(1.2);
+}
+
+@media (max-width: 768px) {
+  .shop-product-card,
+  .wishlist-product-card,
+  .admin-product-card {
+    /* mobile pe hover effects kam rakho */
+    transform: none !important;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+  }
+
+  .shop-slider-inner {
+    border-radius: 16px;
+  }
+
+  .container {
+    animation: page-fade-in 0.25s ease-out;
+  }
+}
