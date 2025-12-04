@@ -46,7 +46,7 @@ function App() {
     if (token && userData) {
       const parsed = JSON.parse(userData);
       setUser(parsed);
-      setCurrentView(parsed.role === 'admin' ? 'dashboard' : 'shop');
+      setCurrentView('shop');
       fetchProducts();
       loadWishlist();
     }
@@ -125,13 +125,7 @@ function App() {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
-
-        if (data.user.role === 'admin') {
-          setCurrentView('dashboard');
-        } else {
-          setCurrentView('shop');
-        }
-
+        setCurrentView('shop');
         fetchProducts();
         showMessage(data.message, 'success');
       } else {
@@ -160,12 +154,7 @@ function App() {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
-
-        if (data.user.role === 'admin') {
-          setCurrentView('dashboard');
-        } else {
           setCurrentView('shop');
-        }
 
         fetchProducts();
         showMessage(data.message, 'success');

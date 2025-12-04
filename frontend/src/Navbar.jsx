@@ -43,7 +43,7 @@ const Navbar = ({ onNavigate, currentView, onLogout, user, products = [], onSear
   return (
     <header className="fb-navbar">
       <div className="fb-nav-left">
-        <div className="fb-logo" onClick={() => onNavigate('dashboard')}>
+        <div className="fb-logo">
           <img
             src="/freshbasketlogo1.png"
             alt="Fresh Basket logo"
