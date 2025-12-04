@@ -90,18 +90,24 @@ function App() {
   };
 
   const fetchProducts = async () => {
-    try {
-      setLoadingProducts(true);
-      const res = await fetch(PRODUCTS_API);
-      const data = await res.json();
-      setProducts(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error('Fetch products error:', err);
-      showMessage('Failed to load products', 'error');
-    } finally {
-      setLoadingProducts(false);
-    }
-  };
+  try {
+    setLoadingProducts(true);
+    const res = await fetch(PRODUCTS_API);
+    const data = await res.json();
+
+    const safe = Array.isArray(data)
+      ? data.filter(p => p && typeof p === 'object')
+      : [];
+
+    setProducts(safe);
+  } catch (err) {
+    console.error('Fetch products error:', err);
+    showMessage('Failed to load products', 'error');
+  } finally {
+    setLoadingProducts(false);
+  }
+};
+
 
   // SIGNUP
   const handleSignup = async (e) => {
@@ -399,8 +405,8 @@ function App() {
                     >
                       <div className="wishlist-product-image">
                         <img
-                          src={product.imageUrl}
-                          alt={product.name}
+                          src={product?.imageUrl || '/placeholder.jpg'}
+                          alt={product?.name || 'Product'}
                           className="wishlist-product-img"
                         />
                         <button
@@ -480,9 +486,9 @@ function App() {
       )}
 
       {message.text && (
-        <div className={`message ${message.type}`}>
-          {message.text}
-        </div>
+        <div className={`toast-message toast-${message.type}`}>
+        {message.text}
+         </div>
       )}
     </div>
   );

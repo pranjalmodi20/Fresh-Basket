@@ -34,8 +34,8 @@ const ProductDetails = ({
       <div className="product-details-content">
         <div className="product-details-left">
           <img
-            src={product.imageUrl}
-            alt={product.name}
+            src={product?.imageUrl || '/placeholder.jpg'}
+            alt={product?.name || 'Product'}
             className="product-details-main-img"
           />
         </div>

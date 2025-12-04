@@ -198,9 +198,8 @@ const Shop = ({
                 (item) => item.product._id === p._id
               )?.quantity || 0;
 
-            const isWished = wishlistItems.some(
-              (item) => item._id === p._id
-            );
+            const isWished = Array.isArray(wishlistItems) &&
+             wishlistItems.some((item) => item && item._id === p._id);
 
             return (
               <article
@@ -210,8 +209,8 @@ const Shop = ({
               >
                 <div className="shop-product-image">
                   <img
-                    src={p.imageUrl}
-                    alt={p.name}
+                    src={p?.imageUrl || '/placeholder.jpg'}
+                    alt={p?.name || 'Product'}
                     className="shop-product-img"
                   />
                   <span className="shop-product-weight">1kg</span>
